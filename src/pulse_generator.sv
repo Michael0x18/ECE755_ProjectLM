@@ -3,6 +3,7 @@ module pulse_generator
 (
     input wire rx,
     input wire delay,
+    input wire clk,
     output wire rx_pulse
 );
 

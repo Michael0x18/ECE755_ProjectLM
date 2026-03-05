@@ -2,3 +2,7 @@ work/
 etch*
 transcript
 vsim.wlf
+long_man_venv
+**/*.fst
+**/results.xml
+**/sim_build
