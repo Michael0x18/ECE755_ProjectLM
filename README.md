@@ -1,15 +1,16 @@
 # Project LM
 
+## Setup
+Run `make venv` to setup the virtual environment
+
 ## Running Testbenches
-Run these commands in the `rtl/` directory to see the waveform from pulse_generator_tb:
+(WIP!) Run `make test` to run all testbenches simutaneously.
+
+To run one test at a time, activate the python virtual environment (`source long_man_venv/bin/activate` if on sh/bash/zsh or `source long_man_venv/bin/activate.fish` if on fish), then run the following command inside the `test/` directory
 ```bash
-vsim -voptargs=+acc work.tb_pulse_generator
+# This command will run one specific test
+make (testbench dir name)
 
-# Run these in the QuestaSim terminal
-vlib work
-vlog -work work *.sv
-
-add wave *
-run -all
-wave zoom full
+# This command will run all testbenches
+make run-all
 ```
