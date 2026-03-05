@@ -13,7 +13,12 @@ wire[3:0] rx_pulse;
 wire rx_shift_nodelay;
 wire rx_shift;
 
-pulse_generator rxp(.rx(RX), .clk({4{clk}}), .rx_pulse(rx_pulse);
+genvar i;
+generate
+	for(i = 0; i < 4; ++i) begin
+		pulse_generator rxp(.rx(RX[i]), .clk(clk), .rx_pulse(rx_pulse[i]));
+	end
+endgenerate
 
 assign rx_shift_nodelay = |rx_pulse;
 assign #25ns rx_shift = rx_shift_nodelay;
