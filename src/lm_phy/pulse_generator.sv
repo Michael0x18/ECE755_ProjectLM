@@ -2,11 +2,12 @@
 module pulse_generator
 (
     input wire rx,
-    input wire delay,
     input wire clk,
     output wire rx_pulse
 );
 
+wire delay;
+assign #5ns delay = rx;
 assign rx_pulse = rx ^ delay;
 
 endmodule
