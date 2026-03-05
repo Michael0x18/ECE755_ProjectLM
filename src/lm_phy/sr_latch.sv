@@ -1,6 +1,6 @@
 `default_nettype none
 module sr(input wire S, input wire R, output wire Q, output wire Q_n);
-    nor n1(Q, R, Q_n;
+    nor n1(Q, R, Q_n);
     nor n2(Q_n, S, Q);
 //             ___
 // S ----------\  \           _

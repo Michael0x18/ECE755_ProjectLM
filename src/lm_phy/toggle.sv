@@ -5,7 +5,7 @@ module toggle(
 	input wire pulse,
 	output reg data
 );
-	always @(posedge, pulse, negedge rst_n) begin
+	always @(posedge pulse, negedge rst_n) begin
 		if(!rst_n) begin
 			data <= 1'b0;
 		end else begin
