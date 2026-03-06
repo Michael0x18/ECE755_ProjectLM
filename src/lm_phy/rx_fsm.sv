@@ -15,8 +15,6 @@ wire data_done;
 wire rdy_pulse;
 wire rdy_delay;
 
-wire[4:0] next_bin_counter;
-assign next_bin_counter =  (counter ^ {1'b0, counter[4:1]}) - 1;
 always @(posedge rx_pulse, negedge clr_vld) begin
     if(~rst_n) begin
         counter <= 5'h10;
