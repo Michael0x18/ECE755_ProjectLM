@@ -7,7 +7,7 @@ module pulse_generator
 );
 
 wire delay;
-assign #5ps delay = rx;
+assign #100ps delay = rx;
 assign rx_pulse = rx ^ delay;
 
 endmodule

@@ -21,7 +21,7 @@ generate
 endgenerate
 
 assign rx_shift_nodelay = |rx_pulse;
-assign #25ns rx_shift = rx_shift_nodelay;
+assign #500ps rx_shift = rx_shift_nodelay;
 
 endmodule
 `default_nettype wire
