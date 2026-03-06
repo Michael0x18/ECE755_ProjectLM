@@ -1,6 +1,5 @@
 `default_nettype none
 module toggle(
-	input wire clk,
 	input wire rst_n,
 	input wire pulse,
 	output reg data
