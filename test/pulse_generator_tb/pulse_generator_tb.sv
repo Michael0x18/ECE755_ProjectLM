@@ -5,7 +5,6 @@ module pulse_generator_tb();
 initial begin
     $dumpfile("pulse_generator_tb.vcd");
     $dumpvars(0, pulse_generator_tb);
-    // #1;
 end
 
 logic clk;

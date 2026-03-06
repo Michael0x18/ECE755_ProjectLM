@@ -7,7 +7,7 @@ from cocotb.triggers import ClockCycles
 
 
 @cocotb.test()
-async def test_project(dut):
+async def test_1(dut):
     dut._log.info("Start")
 
     # Set the clock period to 10 ps (100 GHz)
