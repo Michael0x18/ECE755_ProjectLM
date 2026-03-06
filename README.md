@@ -11,6 +11,14 @@ To run one test at a time, activate the python virtual environment (`source long
 # This command will run one specific test
 make (testbench dir name)
 
+# If you are using questa, you can instead run this for one specific test
+make SIM=questa EXTRA_ARGS="+acc" (testbench dir name)
+
 # This command will run all testbenches
 make run-all
+```
+
+To view the output waveform, run:
+```bash
+gtkwave (testbench_name).vcd
 ```

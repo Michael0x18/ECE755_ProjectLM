@@ -3,16 +3,15 @@
 
 # defaults
 SIM ?= icarus
-FST ?= -fst # Use more efficient FST format
+# FST ?= -fst # Use more efficient FST format # Doesn't seen to be working
 TOPLEVEL_LANG ?= verilog
-SRC_DIR = $(PWD)/../../src
-PROJECT_SOURCES = $(shell basename $(wildcard $(SRC_DIR)/*.sv))
+SRC_DIR = $(PWD)/../../src/lm_phy
 
 ifneq ($(GATES),yes)
 
 # RTL simulation:
 SIM_BUILD				= sim_build/rtl
-VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
+VERILOG_SOURCES += $(wildcard $(SRC_DIR)/*.sv)
 
 else
 
@@ -32,11 +31,11 @@ VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 endif
 
 # Allow sharing configuration between design and testbench via `include`:
-COMPILE_ARGS 		+= -I$(SRC_DIR)
+VERILOG_INCLUDE_DIRS += $(SRC_DIR)
 
 # Include the testbench sources:
 VERILOG_SOURCES += $(wildcard *_tb.sv)
-TOPLEVEL = $(shell echo $(wildcard *_tb.sv) | sed 's|.sv||')
+TOPLEVEL = $(basename $(wildcard *_tb.sv))
 
 $(info TOPLEVEL=$(TOPLEVEL))
 
@@ -47,4 +46,4 @@ COCOTB_TEST_MODULES = $(TOPLEVEL)
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
 waves:
-	gtkwave $(TOPLEVEL).fst
+	gtkwave $(TOPLEVEL).vcd
