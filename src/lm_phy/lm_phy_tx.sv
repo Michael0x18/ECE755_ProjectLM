@@ -15,7 +15,8 @@ module lm_phy_tx(
 wire load_clk;
 wire load_en; 
 wire shift_clk; 
-
+assign load_clk = clk;
+assign load_en = tx_load;
 
 wire[1:0] shift_data;
 tx_shift_reg shift_reg(.load_clk(load_clk), .rst_n(rst_n), .load_en(load_en), .load_data(tx_in), .shift_clk(shift_clk),
