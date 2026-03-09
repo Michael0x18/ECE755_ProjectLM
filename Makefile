@@ -1,6 +1,7 @@
 VENV_DIR := long_man_venv
 PYTHON := python3
-PIP := $(VENV_DIR)/bin/pip
+PIP := $(VENV_DIR)/bin/PIP
+PDK_ROOT := sky130pdk
 
 .PHONY: all test
 
@@ -16,5 +17,16 @@ venv: $(VENV_DIR)/bin/activate
 
 run: venv
 
+$(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v:
+	-mkdir $(PDK_ROOT)
+	PDK_ROOT=$(PDK_ROOT) $(PIP) install ciel
+	. $(VENV_DIR)/bin/activate && \
+		ciel ls-remote --pdk-family=sky130 --pdk-root=$(PDK_ROOT) | \
+		head -n1 | \
+		xargs -I{} ciel enable --pdk-family=sky130 {} --pdk-root=$(PDK_ROOT)
+	touch $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
+
+pdk: $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
+
 clean:
-	rm -rf $(VENV_DIR)
+	rm -rf $(VENV_DIR) $(PDK_ROOT)

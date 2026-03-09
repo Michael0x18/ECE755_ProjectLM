@@ -3,6 +3,7 @@ etch*
 transcript
 vsim.wlf
 long_man_venv
+sky130pdk
 **/*.fst
 **/*.vcd
 **/results.xml
