@@ -30,7 +30,9 @@ reg[5:0] counter; // counter for how many bit groups sent (32 groups of 2 bits =
 ///////////////////
 
 // Counter triggered on ack, reset on load
-always_ff @(posedge ack_pulse, posedge load) begin
+// ASSUMPTION / guess until simulation: On negedge load, we can send the first bit.
+//    No need to wait for clock. ack_pulse won't be sent until at least 1 data is sent.
+always_ff @(posedge ack_pulse, posedge load, negedge load) begin
   // Start-up reset (mostly for simulation)
   if (~rst_n) begin
     counter <= 5'h1F;
