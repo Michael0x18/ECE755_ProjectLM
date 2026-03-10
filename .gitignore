@@ -11,3 +11,4 @@ sky130pdk
 modelsim.ini
 Makefile.template
 __pycache__/
+**/*.vscode

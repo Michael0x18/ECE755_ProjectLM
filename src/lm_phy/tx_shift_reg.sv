@@ -8,12 +8,8 @@ module tx_shift_reg(
     output wire[1:0] shift_data
 );
 
-wire load_clk_gated;
-
-clock_gate_low cgate(.clk(load_clk), .en(load_en), .clk_gated(load_clk_gated));
-
 wire reg_clk;
-assign reg_clk = load_clk_gated | shift_clk;
+assign reg_clk = load_clk | shift_clk;
 
 reg[63:0] data;
 always @(posedge reg_clk, negedge rst_n) begin
