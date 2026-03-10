@@ -1,4 +1,31 @@
 `default_nettype none
+//////////////// Notes ////////////////////////
+//
+///////////Behavior///////////
+//tx_fsm controls how the transmit shift regiter behaves; ie, when to send,
+//shift out values, how many times to shift out (32 times, 2 bits each, 64
+//total)
+//
+///////// IO Details /////////////
+//clk: synchronous clock of the sender side
+//
+//load_clk (comes from top level): gated clock signal base on digital clock
+//(clk) and the load_en signal
+//
+//rst_n: asynchronous reset signal
+//
+//load: load signal itself
+//
+//ack_pulse (comes from top level): acknowledge signal from the rx side saying "hey, i got what you transmitted"
+//
+//done: output signal saying "hey, i've transmitted all 32 packets"
+//
+//shift: muxed ack_pulse; if not done with 32 packets, send the ack_pulse, if
+//done shifting, send 0
+//
+//send_data: ???
+//
+//load_en: flopped load signal
 
 module tx_fsm(
     input wire clk,
@@ -51,6 +78,10 @@ end
 assign load_en = load_flop;
 
 // SR latch for 'is loaded' signal. Set on negedge, reset on help low
+// Note: sets when load_flop is low AND load_edge was detected; i.e, only at
+// a negedge? 
+// resets when load_edge is 0
+// so... a 1 clock cycle pulse relative to the synchornous clock?
 sr load_SR(.S(~load_flop & load_edge), .R(~load_edge), .Q(loaded), .Q_n());
 
 ///////////////////
@@ -59,6 +90,8 @@ sr load_SR(.S(~load_flop & load_edge), .R(~load_edge), .Q(loaded), .Q_n());
 
 wire fsm_clk;
 
+//dictates when the fsm should update/evaluate. only when the load_clk (top
+//level) is true OR when an ack_pulse is recieved
 assign fsm_clk = load_clk | ack_pulse;
 
 // Counter triggered on ack, reset on load
@@ -98,5 +131,4 @@ assign shift = done ? 1'b0 : ack_pulse;
 assign send_data = (loaded | ack_pulse) & ~done;
 
 endmodule
-
 `default_nettype wire
