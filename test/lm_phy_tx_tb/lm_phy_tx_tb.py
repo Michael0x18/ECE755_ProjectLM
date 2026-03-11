@@ -24,7 +24,7 @@ async def rand_ack(dut):
     i = 0
     while True:
         await First(RisingEdge(dut.TX0),RisingEdge(dut.TX1),RisingEdge(dut.TX2),RisingEdge(dut.TX3),FallingEdge(dut.TX0),FallingEdge(dut.TX1),FallingEdge(dut.TX2),FallingEdge(dut.TX3))
-        await Timer(random.randint(12,200), units="ns")
+        await Timer(random.randint(12,48), units="ns")
         i = i ^ 1;
         dut.TX_ACK.value = i
 
@@ -35,10 +35,8 @@ async def test_1(dut):
     # Start a 1GHz clock. This is still stupidly fast compared to what we're actually going to use
     clock=Clock(dut.clk, 1,unit="ns")
     start_clock=cocotb.start_soon(clock.start())
-    cocotb.start_soon(rand_ack(dut))
 
     # At time t=0, hold chip in reset. Do not assert any other signals.
-    dut.TX_ACK.value=0
     dut.tx_in.value=18934712980471211
     dut.tx_load.value=0
     dut.rst_n.value=0
@@ -47,6 +45,8 @@ async def test_1(dut):
     await ClockCycles(dut.clk,5)
     dut.rst_n.value=1
     # Wait five cycles so we don't send immediately. Because that is unrealistic.
+    await ClockCycles(dut.clk,5)
+    cocotb.start_soon(rand_ack(dut))
     await ClockCycles(dut.clk,5)
 
     dut.tx_load.value=1
