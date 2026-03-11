@@ -8,7 +8,6 @@ module rx_fsm(
     output wire ack_toggle
 );
 
-
 wire clr_vld;
 reg[4:0] counter;
 wire data_done;

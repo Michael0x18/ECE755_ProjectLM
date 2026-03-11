@@ -1,18 +1,16 @@
 `default_nettype none
-module lm_phy_tx(
+module lm_phy_tx #(
+	parameter WIDTH=64
+)(
 	input wire clk,
 	input wire rst_n,
-	input wire [63:0] tx_in,
+	input wire [WIDTH-1:0] tx_in,
 	input wire tx_load,
 	output wire tx_done,
 	output wire[3:0] TX,
 	input wire TX_ACK
 );
 
-// TODO: Add control FSM
-
-
-// TODO: Assign these
 wire load_clk;
 wire load_en; 
 wire shift_clk;
@@ -20,7 +18,6 @@ wire shift;
 
 wire send_data;
 
-//TODO: add a pulse generator connected to TX_ACK, feeds into the tx_fsm
 wire ack_pulse;
 pulse_generator pgen(.rx(TX_ACK), .clk(clk), .rx_pulse(ack_pulse));
 
@@ -28,11 +25,11 @@ clock_gate_low load_cgate(.clk(clk), .en(load_en), .clk_gated(load_clk));
 //clock_gate_low shift_cgate(.clk(clk), .en(shift), .clk_gated(shift_clk));
 assign shift_clk=shift;
 
-tx_fsm tx_fsm(.clk(clk), .load_clk(load_clk), .rst_n(rst_n), .load(tx_load), .ack_pulse(ack_pulse), .done(tx_done), 
+tx_fsm #(WIDTH) tx_fsm(.clk(clk), .load_clk(load_clk), .rst_n(rst_n), .load(tx_load), .ack_pulse(ack_pulse), .done(tx_done), 
 	.shift(shift), .send_data(send_data), .load_en(load_en));
 
 wire[1:0] shift_data;
-tx_shift_reg shift_reg(.load_clk(load_clk), .rst_n(rst_n), .load_en(load_en), .load_data(tx_in), .shift_clk(shift_clk),
+tx_shift_reg #(WIDTH) shift_reg(.load_clk(load_clk), .rst_n(rst_n), .load_en(load_en), .load_data(tx_in), .shift_clk(shift_clk),
 	.shift_data(shift_data));
 
 wire shift_delay;

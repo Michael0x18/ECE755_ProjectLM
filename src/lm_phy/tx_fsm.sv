@@ -27,7 +27,7 @@
 //
 //load_en: flopped load signal
 
-module tx_fsm(
+module tx_fsm #(parameter WIDTH = 64)(
     input wire clk,
     input wire load_clk,
     input wire rst_n,
@@ -51,7 +51,7 @@ were wrong may also be wrong by others viewing our presentations.
 // Wires and Regs //
 ////////////////////
 
-reg[4:0] counter; // counter for how many bit groups sent (32 groups of 2 bits = 64 bits total)
+reg[$clog2(WIDTH):0] counter; // counter for how many bit groups sent (32 groups of 2 bits = 64 bits total)
 
 reg load_flop; // register to hold the load value on clock edge
 reg load_edge; // register for holding previous value of load, for edge detection
@@ -98,13 +98,13 @@ assign fsm_clk = load_clk | ack_pulse;
 always_ff @(posedge fsm_clk, negedge rst_n) begin
   // Start-up reset (mostly for simulation)
   if (~rst_n) begin
-    counter <= 5'h1F;
+    counter <= WIDTH-1;
     done <= 1'b0;
   end
 
   // when `load` is set, reset the counter and done state
   else if (load_flop) begin
-    counter <= 5'h1F;
+    counter <= WIDTH-1;
     done <= 1'b0;
   end
 
