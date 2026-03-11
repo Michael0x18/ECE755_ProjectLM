@@ -1,6 +1,6 @@
 VENV_DIR := long_man_venv
-PYTHON := python3
-PIP := $(VENV_DIR)/bin/PIP
+PYTHON := $(shell command -v python3.13 2>/dev/null || command -v python3)
+PIP := $(VENV_DIR)/bin/pip
 PDK_ROOT := sky130pdk
 
 .PHONY: all test
