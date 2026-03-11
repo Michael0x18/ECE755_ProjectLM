@@ -51,7 +51,7 @@ were wrong may also be wrong by others viewing our presentations.
 // Wires and Regs //
 ////////////////////
 
-reg[$clog2(WIDTH):0] counter; // counter for how many bit groups sent (32 groups of 2 bits = 64 bits total)
+reg[$clog2(WIDTH/2):0] counter; // counter for how many bit groups sent (32 groups of 2 bits = 64 bits total)
 
 reg load_flop; // register to hold the load value on clock edge
 reg load_edge; // register for holding previous value of load, for edge detection
@@ -98,20 +98,20 @@ assign fsm_clk = load_clk | ack_pulse;
 always_ff @(posedge fsm_clk, negedge rst_n) begin
   // Start-up reset (mostly for simulation)
   if (~rst_n) begin
-    counter <= WIDTH-1;
+    counter <= (WIDTH/2)-1;
     done <= 1'b0;
   end
 
   // when `load` is set, reset the counter and done state
   else if (load_flop) begin
-    counter <= WIDTH-1;
+    counter <= (WIDTH/2)-1;
     done <= 1'b0;
   end
 
   // Identical counter and done logic as rx_fsm
   else if (~done) begin
     counter <= counter - 1;
-    done <= (counter == 5'h00);
+    done <= (counter == '0);
   end
 
   // Once done is set, it keeps its value until next load (i.e., stops counting)
