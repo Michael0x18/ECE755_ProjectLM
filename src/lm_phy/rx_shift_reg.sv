@@ -1,16 +1,16 @@
 `default_nettype none
-module rx_shift_reg(
+module rx_shift_reg #(parameter WIDTH = 64) (
     input wire shift_clk,
     input wire rst_n,
     input wire[1:0] shift_data,
-    output reg[63:0] rx_out
+    output reg[WIDTH-1:0] rx_out
 );
 
 always @(posedge shift_clk, negedge rst_n) begin
     if(~rst_n) begin
-        rx_out <= 64'h0;
+        rx_out <= '0;
     end else begin
-        rx_out <= {shift_data, rx_out[63:2]};
+        rx_out <= {shift_data, rx_out[WIDTH-1:2]};
     end
 end
 
