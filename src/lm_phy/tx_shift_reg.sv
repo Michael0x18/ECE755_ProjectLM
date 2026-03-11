@@ -1,5 +1,6 @@
 `default_nettype none
 module tx_shift_reg #(parameter WIDTH=64) (
+		input wire clk,
     input wire load_clk,
     input wire rst_n,
     input wire load_en,

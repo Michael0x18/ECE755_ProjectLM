@@ -21,55 +21,51 @@
 import random
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
-from cocotb.triggers import RisingEdge
-
-
-async def run_shift_reg(dut,a,b):
-    cocotb.log.info("start test_1")
-    #deifne a clock for the synchronous digital side
-    load_clock=Clock(dut.load_clk,a,unit="ps")
-    load_task=cocotb.start_soon(load_clock.start())
-    #deifne a clock for the asynchronous transmit side; NOTE: normally defined by the state machine, here just for testing
-    shift_clock=Clock(dut.shift_clk,b,unit="ps")
-    #initially set the driving values to the DUT
-    dut.rst_n.value=0
-    dut.load_en.value=1 
-    dut.load_data.value=0
-    dut.shift_clk.value=0
-    await ClockCycles(dut.load_clk, 2)
-    dut.rst_n.value=1
-    expected=random.randint(0,(1<<4)-1)
-    dut.load_data.value=expected
-    await ClockCycles(dut.load_clk, 1)
-    dut.load_en.value=0
-    shift_task=cocotb.start_soon(shift_clock.start())
-    bit_list=[]
-    for i in range(32):
-        bit_list.append(0)
-    for i in range(32):
-        await RisingEdge(dut.shift_clk)
-        bit_list.insert(0,(dut.shift_data.value.integer))
-    recieved=0
-    for i,bits in enumerate(bit_list):
-        recieved|=(bits<<(i*2))
-    assert recieved==expected
-
-    #after 32 clock cycles of this, should yield the "correct" val?
-
-    #kill the previous 2 clocks?
-    shift_task.kill()
-    load_task.kill()
-    #start the clock, wait for a few clock cycles
-    cocotb.log.info("end test_1")
+from cocotb.triggers import ClockCycles, RisingEdge, FallingEdge
 
 @cocotb.test()
-async def test_2(dut):
-    for _ in range(100):
-        a=random.randint(1,25)*2
-        b=random.randint(1,25)*2
-        cocotb.log.info(f"esting a={a}ps,b={b}ps")
-        await run_shift_reg(dut, a, b)
+async def test_1(dut):
+    clock = Clock(dut.clk, 2, unit='ps')
+    cocotb.start_soon(clock.start())
+
+    dut.rst_n.value = 0
+    dut.load_data.value = 0
+    dut.load_clk.value = 0
+    dut.load_en.value = 0
+    dut.shift_clk.value = 0
+
+    await ClockCycles(dut.clk, 4)
+
+    dut.rst_n.value = 1
+
+    await ClockCycles(dut.clk, 4)
+
+    random_data = random.getrandbits(64)
+    dut.load_data.value = random_data
+
+    await ClockCycles(dut.clk, 2)
+
+    load_clk = Clock(dut.load_clk, 2, unit='ps')
+    cocotb.start_soon(load_clk.start())
+    dut.load_en.value = 1
+
+    await ClockCycles(dut.clk, 1)
+
+    load_clk.stop()
+    dut.load_en.value = 0
+    dut.load_clk.value = 0
+
+    await ClockCycles(dut.clk, 4)
+
+    shift_clk = Clock(dut.shift_clk, 6, unit='ps', period_high=2)
+    cocotb.start_soon(shift_clk.start())
+
+    for i in range(32):
+        await RisingEdge(dut.shift_clk)
+        dut._log.info(f"Actual value: {(random_data & (0b11 << (2*i))) >> ((2*i))}; Expected value: {int(dut.shift_data.value)}") 
+        assert(dut.shift_data.value == int((random_data & (0b11 << (2*i))) >> ((2*i))))
+
+    
 
 
 
