@@ -4,7 +4,7 @@ module lm_phy_rx #(
 )(
 	input wire clk,
 	input wire rst_n,
-	input wire [63:0] rx_out,
+	output wire [WIDTH-1:0] rx_out,
 	input wire rx_rdy,
 	output wire rx_vld,
 	input wire[3:0] RX,
@@ -48,6 +48,12 @@ always @(posedge ack_toggle, negedge rst_n) begin
 		RX_ACK <= ~RX_ACK;
 	end
 end
+
+wire[1:0] rx_encoded;
+
+encoder4_2 enc(.in(Q), .out(rx_encoded));
+
+rx_shift_reg shift_reg(.shift_clk(rx_shift), .rst_n(rst_n), .shift_data(rx_encoded), .rx_out(rx_out));
 
 endmodule
 `default_nettype wire
