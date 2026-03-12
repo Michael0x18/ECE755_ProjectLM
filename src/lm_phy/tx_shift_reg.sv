@@ -1,6 +1,6 @@
 `default_nettype none
 module tx_shift_reg #(parameter WIDTH=64) (
-    input wire load_clk,
+    input wire load_clk_gated,
     input wire rst_n,
     input wire load_en,
     input wire [WIDTH-1:0] load_data,
@@ -8,17 +8,8 @@ module tx_shift_reg #(parameter WIDTH=64) (
     output wire [1:0] shift_data
 );
 
-  wire load_clk_gated;
-
-  clock_gate_low cgate (
-      .clk(load_clk),
-      .en(load_en),
-      .clk_gated(load_clk_gated)
-  );
-
   wire reg_clk;
   assign reg_clk = load_clk_gated | shift_clk;
-
 
   reg [WIDTH-1:0] data;
   assign shift_data = data[1:0];

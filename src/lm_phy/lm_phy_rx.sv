@@ -25,7 +25,7 @@ wire ack_toggle;
 genvar i;
 generate
 	for(i = 0; i < 4; ++i) begin
-		pulse_generator rxp(.rx(RX[i]), .clk(clk), .rx_pulse(rx_pulse[i]));
+		pulse_generator rxp(.rx(RX[i]), .rx_pulse(rx_pulse[i]));
 		sr srl(.S(S[i]), .R(R[i]), .Q(Q[i]), .Q_n(_Q_n[i]));
 	end
 endgenerate
