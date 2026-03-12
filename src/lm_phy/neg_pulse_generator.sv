@@ -8,7 +8,7 @@ module pos_pulse_generator
 reg delay;
 buf #(100ps, 100ps) buffer(delay, rx);
 
-assign rx_pulse = rx ^ delay;
+assign rx_pulse = ~rx & delay;
 
 endmodule
 `default_nettype wire
