@@ -16,7 +16,7 @@ always @(posedge clk, negedge rst_n) begin
 	if(~rst_n) begin
 		load_en <= 1'b0;
 	end else begin
-		load_en <= load;
+		load_en <= tx_load;
 	end
 end
 
@@ -33,15 +33,15 @@ pulse_generator pgen(.rx(TX_ACK), .rx_pulse(ack_pulse));
 // Otherwise their clocks come from ack_pulse
 clock_gate_low load_cgate(.clk(clk), .en(load_en), .clk_gated(load_clk_gated));
 
-tx_fsm #(WIDTH) tx_fsm(.clk(clk), .load_clk(load_clk_gated), .rst_n(rst_n), .load(tx_load), .ack_pulse(ack_pulse), .done(tx_done), 
-	.shift(shift), .send_data(send_data), .load_en(load_en));
+//tx_fsm #(WIDTH) tx_fsm(.clk(clk), .load_clk(load_clk_gated), .rst_n(rst_n), .load(tx_load), .ack_pulse(ack_pulse), .done(tx_done), 
+//	.shift(shift), .send_data(send_data), .load_en(load_en));
 
 wire[1:0] shift_data;
-tx_shift_reg #(WIDTH) shift_reg(.load_clk_gated(load_clk_gated), .rst_n(rst_n), .load_en(load_en), .load_data(tx_in), .shift_clk(shift_clk),
+tx_shift_reg #(WIDTH) shift_reg(.load_clk_gated(load_clk_gated), .rst_n(rst_n), .load_en(load_en), .load_data(tx_in), .shift_clk(shift),
 	.shift_data(shift_data));
 
-logic shift_delay;
-buf #(500ps,500ps) buffer(shift_delay, shift);
+logic send_delay;
+buf #(500ps,500ps) buffer(send_delay, send_data);
 
 wire[3:0] decode_out;
 decoder2_4 decoder(.in(shift_data), .out(decode_out));
@@ -49,7 +49,7 @@ decoder2_4 decoder(.in(shift_data), .out(decode_out));
 genvar i;
 generate
 	for(i = 0; i < 4; i = i + 1) begin
-		toggle tgl(.rst_n(rst_n), .pulse(decode_out[i] & shift_delay), .data(TX[i]) );
+		toggle tgl(.rst_n(rst_n), .pulse(decode_out[i] & send_delay), .data(TX[i]) );
 	end
 endgenerate
 
