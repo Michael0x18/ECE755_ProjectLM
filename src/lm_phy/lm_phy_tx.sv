@@ -11,31 +11,37 @@ module lm_phy_tx #(
 	input wire TX_ACK
 );
 
-wire load_clk;
-wire load_en; 
-wire shift_clk;
+reg load_en;
+always @(posedge clk, negedge rst_n) begin
+	if(~rst_n) begin
+		load_en <= 1'b0;
+	end else begin
+		load_en <= load;
+	end
+end
+
 wire shift;
+wire load_clk_gated;
 
 wire send_data;
 
+// Turn either edge of TX_ACK into short pulse
 wire ack_pulse;
 pulse_generator pgen(.rx(TX_ACK), .rx_pulse(ack_pulse));
 
-clock_gate_low load_cgate(.clk(clk), .en(load_en), .clk_gated(load_clk));
-//clock_gate_low shift_cgate(.clk(clk), .en(shift), .clk_gated(shift_clk));
-assign shift_clk=shift;
+// Gate the clock so fsm and shift reg receive it only when load is asserted.
+// Otherwise their clocks come from ack_pulse
+clock_gate_low load_cgate(.clk(clk), .en(load_en), .clk_gated(load_clk_gated));
 
-tx_fsm #(WIDTH) tx_fsm(.clk(clk), .load_clk(load_clk), .rst_n(rst_n), .load(tx_load), .ack_pulse(ack_pulse), .done(tx_done), 
+tx_fsm #(WIDTH) tx_fsm(.clk(clk), .load_clk(load_clk_gated), .rst_n(rst_n), .load(tx_load), .ack_pulse(ack_pulse), .done(tx_done), 
 	.shift(shift), .send_data(send_data), .load_en(load_en));
 
 wire[1:0] shift_data;
-tx_shift_reg #(WIDTH) shift_reg(.load_clk(load_clk), .rst_n(rst_n), .load_en(load_en), .load_data(tx_in), .shift_clk(shift_clk),
+tx_shift_reg #(WIDTH) shift_reg(.load_clk_gated(load_clk_gated), .rst_n(rst_n), .load_en(load_en), .load_data(tx_in), .shift_clk(shift_clk),
 	.shift_data(shift_data));
 
 logic shift_delay;
-always_comb begin
-	shift_delay <= #500ps send_data;
-end
+buf #(500ps,500ps) buffer(shift_delay, shift);
 
 wire[3:0] decode_out;
 decoder2_4 decoder(.in(shift_data), .out(decode_out));

@@ -1,5 +1,5 @@
 `default_nettype none
-module pos_pulse_generator
+module pulse_generator
 (
     input wire rx,
     output wire rx_pulse
