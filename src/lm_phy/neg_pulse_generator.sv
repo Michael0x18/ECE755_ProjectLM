@@ -5,8 +5,8 @@ module neg_pulse_generator
     output wire rx_pulse
 );
 
-reg delay;
-buf #(100ps, 100ps) buffer(delay, rx);
+wire delay;
+delayline #(10) dl(delay, rx);
 
 assign rx_pulse = ~rx & delay;
 

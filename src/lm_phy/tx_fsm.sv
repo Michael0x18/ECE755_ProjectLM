@@ -73,7 +73,7 @@ end
 
 assign shift = done ? 1'b0 : ack_pulse;
 
-pos_pulse_generator send_data_pulse(.rx(loaded | ack_pulse & ~done), .rx_pulse(send_data));
+neg_pulse_generator send_data_pulse(.rx(loaded | ack_pulse & ~done), .rx_pulse(send_data));
 
 endmodule
 `default_nettype wire
