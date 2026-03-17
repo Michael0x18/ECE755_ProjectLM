@@ -12,3 +12,4 @@ modelsim.ini
 Makefile.template
 __pycache__/
 **/*.vscode
+**/.DS_Store
