@@ -20,7 +20,7 @@ module tt_um_example (
 // Wires and Regs //
 ////////////////////
 
-wire MISO;
+logic MISO;
 wire MOSI;
 wire SCLK;
 wire CAPTURE;
@@ -30,10 +30,10 @@ wire VLD;
 wire LOAD;
 wire DONE;
 
-wire TX0;
-wire TX1;
-wire TX2;
-wire TX3;
+logic TX0;
+logic TX1;
+logic TX2;
+logic TX3;
 
 wire RX0;
 wire RX1;
@@ -84,11 +84,13 @@ assign uio_out[5] = DBG_OUT; assign uio_oe[5] = 1'b1;
 
 //////////////// SPI UNIT ////////////////////
 
+// Read In: SPI reads in 4 bits at a time (Most Significant Bit read in first)
 logic [3:0] SPI_shift_reg;
 logic [1:0] SPI_count;  // Counts 0 -> 3
 logic [3:0] next_shift;
+logic [3:0] tx_in;
+assign tx_in = {TX3, TX2, TX1, TX0};
 
-// SPI reads in 4 bits at a time (Most Significant Bit read in first)
 always_comb begin
     next_shift = {SPI_shift_reg[2:0], MOSI};
 end
@@ -111,7 +113,22 @@ always_ff @(posedge SCLK) begin
     end
 end
 
-// TODO: REST
+
+// Write out: SPI reads out 4 bits at a time (Most Significant Bit read out first)
+logic [3:0] SPI_shift_out_reg;
+
+always_ff @(negedge SCLK) begin
+    // Load into shift register when data is valid
+    if (VLD) begin
+        SPI_shift_out_reg <= {RX3, RX2, RX1, RX0}; // MSB: LSB
+    
+    // Shift at next clk cycle
+    end else begin
+        MISO <= SPI_shift_out_reg[3];
+        SPI_shift_out_reg <= {SPI_shift_out_reg[2:0], 0};
+    end
+
+end
 ////////////////////////////////////////////////
 
 
@@ -124,7 +141,7 @@ lm_phy_top iPHY #(WIDTH=16) (
 	.rst_n_async(rst_n),
 
 	// TX chip side interface
-	.tx_in(/* TODO : SPI CONNECTION */),
+	.tx_in(tx_in),
 	.tx_load(LOAD),
 	.tx_done(DONE),
 
