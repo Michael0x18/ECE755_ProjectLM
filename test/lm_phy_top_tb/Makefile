@@ -3,7 +3,6 @@
 
 # defaults
 SIM ?= icarus
-WAVES?=1
 # FST ?= -fst # Use more efficient FST format # Doesn't seen to be working
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../../src/lm_phy
@@ -27,7 +26,7 @@ VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitiv
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 
 # this gets copied in by the GDS action workflow
-VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
+VERILOG_SOURCES += $(wildcard *.vg)
 
 endif
 
@@ -47,4 +46,4 @@ COCOTB_TEST_MODULES = $(TOPLEVEL)
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
 waves:
-	gtkwave $(TOPLEVEL).vcd &
+	gtkwave $(TOPLEVEL).vcd
