@@ -42,29 +42,20 @@ module rx_fsm (
     end
   end
 
-  //maybe send a fixed-time pulse on the negative edge of rdy_pulse? 
-  //1) rdy is asserted
-  //2) generates a fixed-length pulse (rdy_pulse). 
-  //3) at the negedge of rdy_pulse, *then* send out the actual one?
-  reg rdy_pulse_delay;
-  always@(rdy_pulse)
-    rdy_pulse_delay<=#10ps rdy_pulse;
-
-
-  // TODO replace this with standard cell components
-  // TODO; replace this with a delay line
-  //assign #100ps rdy_delay = rdy;
-  always @(rdy, negedge rst_n) begin
-    if (~rst_n) rdy_delay <= 1'b0;
-    else rdy_delay <= #10ps rdy;
+  reg[1:0] rdy_ff;
+  // Flop rdy
+  always @(posedge clk, negedge rst_n) begin
+    if(~rst_n) begin
+      rdy_ff <= 2'b0;
+    end else begin
+      rdy_ff <= {rdy_ff[0], rdy};
+    end
   end
-  assign rdy_pulse = (rdy & ~rdy_delay);
-  //NOTE: causes an error if rx_pulse arrives too EARLY
-  //i.e, while rdy_pulse s still high, rx_pulse arrives, causing rdy_pulse to
-  //be one continuous pulse instead of 2; misses transmission, STALLS!
-  //assume that rx_pulse WILL arrive ONLY after rdy_pulse de-asserts? 
+  wire rdy_posedge;
+  assign rdy_posedge = (rdy_ff[0] & ~rdy_ff[1]);
+  pos_pulse_generator rdy_pulse_gen(.rx(rdy_posedge), .rx_pulse(rdy_pulse));
 
-  assign ack_toggle = (vld||counter==5'h10) ? rdy_pulse_delay : rx_pulse;
+  assign ack_toggle = (vld||counter==5'h10) ? rdy_pulse : rx_pulse;
 
   assign clr_vld = rst_n & ~rdy_pulse;
 
