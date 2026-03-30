@@ -157,6 +157,7 @@ always @(posedge clk, negedge rst_n) begin
   else if (SCLK_posedge & rx_shift_en) begin
     MISO <= rx_buf[0];
     rx_buf <= {1'b0, rx_buf[WIDTH-1:1]};
+    rx_bit_cnt <= rx_bit_cnt + 1;
   end
   else if (SCLK_posedge) begin
     rx_bit_cnt <= '0;
