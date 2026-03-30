@@ -23,7 +23,7 @@ async def test_1(dut):
     clock=Clock(dut.clk,4,unit="ps")
     start_clock=cocotb.start_soon(clock.start())
     dut.rst_n.value=0
-    dut.tx_in.value=18934712980471211
+    dut.tx_in.value=0xBEEF
 
     dut.rx_rdy.value = 0
     dut.tx_load.value = 0

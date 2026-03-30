@@ -9,7 +9,7 @@
 //rx_rdy: telling the module "hey, im ready to recieve"
 ///////OUTPUTS//////////
 module lm_phy_top_tb ();
-localparam WIDTH=64;
+localparam WIDTH=16;
 
   initial begin
     $dumpfile("lm_phy_top_tb.vcd");
@@ -38,7 +38,7 @@ localparam WIDTH=64;
   //assume TB uses a width of 16. parameterize later
   lm_phy_top #(16) iDUT (
       .clk(clk),
-      .rst_n_async(rst_n),
+      .rst_n(rst_n),
       .tx_in(tx_in),
       .tx_load(tx_load),
       .tx_done(tx_done),
