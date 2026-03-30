@@ -33,12 +33,10 @@ localparam WIDTH=64;
   wire TX_ACK;
 
   // TX off chip interface
-  wire [3:0] RX;
-  wire RX_ACK;
 
 
   //assume TB uses a width of 16. parameterize later
-  lm_phy_top iDUT (
+  lm_phy_top #(16) iDUT (
       .clk(clk),
       .rst_n_async(rst_n),
       .tx_in(tx_in),
@@ -49,8 +47,8 @@ localparam WIDTH=64;
       .rx_rdy(rx_rdy),
       .TX(TX),
       .TX_ACK(TX_ACK),
-      .RX(RX),
-      .RX_ACK(RX_ACK)
+      .RX(TX),
+      .RX_ACK(TX_ACK)
   );
 endmodule
 

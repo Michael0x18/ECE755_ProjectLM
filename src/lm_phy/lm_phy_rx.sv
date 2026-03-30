@@ -28,7 +28,7 @@ genvar i;
 generate
 	for(i = 0; i < 4; ++i) begin
 		pulse_generator rxp(.rx(RX[i]), .rx_pulse(rx_pulse[i]));
-		sr srl(.S(S[i]), .R(R[i]), .Q(Q[i]), .Q_n(Q_n[i]));
+		sr srl(.S(S[i] & rst_n), .R(R[i] | ~rst_n), .Q(Q[i]), .Q_n(Q_n[i]));
 	end
 endgenerate
 
@@ -40,8 +40,7 @@ assign S[3] = R[0]|R[1]|R[2];
 
 assign rx_shift_nodelay = |rx_pulse;
 //assign  rx_shift = #500ps rx_shift_nodelay;
-always@(rx_shift_nodelay)
-  rx_shift<=#500ps rx_shift_nodelay;
+delayline #(50) dl2(.in(rx_shift_nodelay), .out(rx_shift));
 
 rx_fsm fsm(.clk(clk), .rst_n(rst_n), .rdy(rx_rdy), .vld(rx_vld), .rx_pulse(rx_shift), .ack_toggle(ack_toggle));
 
