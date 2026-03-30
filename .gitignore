@@ -13,3 +13,5 @@ Makefile.template
 __pycache__/
 **/*.vscode
 **/.DS_Store
+**/a.out
+**/*.swp
