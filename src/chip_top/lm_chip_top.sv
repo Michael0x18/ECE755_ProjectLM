@@ -5,7 +5,7 @@
  * and connects them to the phy components. Additionally houses test FFs to bring out signals.
  */
 
-module tt_um_example (
+module lm_chip_top (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
@@ -30,19 +30,12 @@ wire VLD;
 wire LOAD;
 wire DONE;
 
-logic TX0;
-logic TX1;
-logic TX2;
-logic TX3;
+logic [3:0] TX;
 
-wire RX0;
-wire RX1;
-wire RX2;
-wire RX3;
+logic [3:0] RX;
 
 wire TX_ACK;
 wire RX_ACK;
-
 
 wire [3:0] DBG_ADDR;
 wire DBG_OUT;
@@ -51,7 +44,7 @@ wire DBG_OUT;
 // TTSKY130 pins <-> internal signals //
 ////////////////////////////////////////
 
-assign uo_out[5] = MISO;
+assign uo_out[7] = MISO;
 assign MOSI = ui_in[7];
 assign SCLK = uio_in[6]; assign uio_oe[6] = 1'b0;
 assign CAPTURE = uio_in[7]; assign uio_oe[7] = 1'b0;
@@ -61,15 +54,15 @@ assign uo_out[6] = VLD;
 assign LOAD = ui_in[5];
 assign uo_out[5] = DONE;
 
-assign uo_out[0] = TX0;
-assign uo_out[1] = TX1;
-assign uo_out[2] = TX2;
-assign uo_out[3] = TX3;
+assign uo_out[0] = TX[0];
+assign uo_out[1] = TX[1];
+assign uo_out[2] = TX[2];
+assign uo_out[3] = TX[3];
 
-assign RX0 = ui_in[0];
-assign RX1 = ui_in[1];
-assign RX2 = ui_in[2];
-assign RX3 = ui_in[3];
+assign RX[0] = ui_in[0];
+assign RX[1] = ui_in[1];
+assign RX[2] = ui_in[2];
+assign RX[3] = ui_in[3];
 
 assign TX_ACK = ui_in[4];
 assign uo_out[4] = RX_ACK;
@@ -89,9 +82,8 @@ reset_sync u_rst_sync(.clk(clk), .rst_n_async(rst_n), .rst_n(rst_n_sync));
 //////////////// SPI UNIT ////////////////////
 
 wire [15:0] rx_data, tx_data;
-wire tx_full;
 
-lm_SPI #(WIDTH=16) iSPI (
+lm_SPI #(16) iSPI (
     .clk(clk),
     .rst_n(rst_n_sync),
 
@@ -114,7 +106,7 @@ lm_SPI #(WIDTH=16) iSPI (
 
 /////////////////// LM PHY /////////////////////
 
-lm_phy_top #(WIDTH=16) iPHY (
+lm_phy_top #(16) iPHY (
 	.clk(clk),
 	.rst_n(rst_n_sync),
 

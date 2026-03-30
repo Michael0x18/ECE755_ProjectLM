@@ -54,7 +54,7 @@ async def send_data(dut, data):
     #load sequence
     dut.tx_load.value=0
     
-    for _ in range(6):
+    for _ in range(7):
         await Edge(dut.TX_ACK)
         
     await ClockCycles(dut.clk, 100);
@@ -90,7 +90,7 @@ async def test_2(dut):
     
     await reset(dut)
     
-    await send_data(dut, 0xB00B)
+    await send_data(dut, 0x9922)
     
     assert(dut.tx_done.value == 1);
     assert(dut.rx_out.value == dut.tx_in.value);
