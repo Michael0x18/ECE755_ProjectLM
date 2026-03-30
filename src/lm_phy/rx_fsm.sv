@@ -13,7 +13,7 @@
 //To indicate to the TX side that "hey, im listening", 
 //TODO: add parameterization to change bit width
 `default_nettype none
-module rx_fsm (
+module rx_fsm #(WIDTH=64) (
     input  wire clk,
     input  wire rst_n,
     input  wire rdy,
@@ -23,7 +23,7 @@ module rx_fsm (
 );
 
   wire clr_vld;
-  reg [4:0] counter;
+  reg [$clog2(WIDTH):0] counter;
   wire data_done;
   wire rdy_pulse;
   reg rdy_delay;
@@ -34,7 +34,7 @@ module rx_fsm (
   //solution: replace reset conditin with ~clr_vld?
   always @(posedge rx_pulse, negedge clr_vld) begin
     if (~clr_vld) begin
-      counter <= 5'h10;
+      counter <= WIDTH;
       vld <= 1'b0;
     end else begin
       counter <= counter - 1;
@@ -55,7 +55,7 @@ module rx_fsm (
   assign rdy_posedge = (rdy_ff[0] & ~rdy_ff[1]);
   pos_pulse_generator rdy_pulse_gen(.rx(rdy_posedge), .rx_pulse(rdy_pulse));
 
-  assign ack_toggle = (vld||counter==5'h10) ? rdy_pulse : rx_pulse;
+  assign ack_toggle = (vld||counter==WIDTH) ? rdy_pulse : rx_pulse;
 
   assign clr_vld = rst_n & ~rdy_pulse;
 

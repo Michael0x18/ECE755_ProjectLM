@@ -32,11 +32,11 @@ generate
 	end
 endgenerate
 
-assign R = rx_pulse;
-assign S[0] = R[1]|R[2]|R[3];
-assign S[1] = R[0]|R[2]|R[3];
-assign S[2] = R[0]|R[1]|R[3];
-assign S[3] = R[0]|R[1]|R[2];
+assign S = rx_pulse;
+assign R[0] = S[1]|S[2]|S[3];
+assign R[1] = S[0]|S[2]|S[3];
+assign R[2] = S[0]|S[1]|S[3];
+assign R[3] = S[0]|S[1]|S[2];
 
 assign rx_shift_nodelay = |rx_pulse;
 //assign  rx_shift = #500ps rx_shift_nodelay;
@@ -56,7 +56,7 @@ wire[1:0] rx_encoded;
 
 encoder4_2 enc(.in(Q), .out(rx_encoded));
 
-rx_shift_reg shift_reg(.shift_clk(rx_shift), .rst_n(rst_n), .shift_data(rx_encoded), .rx_out(rx_out));
+rx_shift_reg #(WIDTH) shift_reg(.shift_clk(rx_shift), .rst_n(rst_n), .shift_data(rx_encoded), .rx_out(rx_out));
 
 endmodule
 

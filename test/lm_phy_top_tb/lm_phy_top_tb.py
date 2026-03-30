@@ -20,7 +20,7 @@ from cocotb.triggers import Timer
 @cocotb.test()
 async def test_1(dut):
     cocotb.log.info("start test 1")
-    clock=Clock(dut.clk,4,unit="ps")
+    clock=Clock(dut.clk,1,unit="ns")
     start_clock=cocotb.start_soon(clock.start())
     dut.rst_n.value=0
     dut.tx_in.value=0xBEEF
