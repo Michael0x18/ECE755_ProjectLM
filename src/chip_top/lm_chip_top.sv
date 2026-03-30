@@ -81,6 +81,8 @@ assign uio_out[5] = DBG_OUT; assign uio_oe[5] = 1'b1;
 // MODULE INSTANSTIATION //
 ///////////////////////////
 
+///////////// Reset Syncronizer //////////////
+
 wire rst_n_sync;
 reset_sync u_rst_sync(.clk(clk), .rst_n_async(rst_n), .rst_n(rst_n_sync));
 
@@ -106,9 +108,11 @@ lm_SPI #(WIDTH=16) iSPI (
 ////////////////////////////////////////////////
 
 
-//////////////// Debug UNIT ////////////////////
+//////////////// DEBUG UNIT ////////////////////
 // TODO: DEBUG UNIT
 ////////////////////////////////////////////////
+
+/////////////////// LM PHY /////////////////////
 
 lm_phy_top #(WIDTH=16) iPHY (
 	.clk(clk),
@@ -132,6 +136,8 @@ lm_phy_top #(WIDTH=16) iPHY (
 	.RX(RX),
 	.RX_ACK(RX_ACK)
 );
+
+////////////////////////////////////////////////
 
 endmodule
 `default_nettype wire
