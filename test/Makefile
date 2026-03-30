@@ -16,3 +16,6 @@ $(TESTBENCHES):
 
 %-gates:
 	PDK_ROOT=$(PDK_ROOT) $(MAKE) -C $* GATES=yes
+
+%-waves:
+	$(MAKE) -C $* waves
