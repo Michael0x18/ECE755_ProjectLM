@@ -11,7 +11,6 @@ module lm_SPI #(WIDTH = 64) (
   input wire SCLK_async,
 
   // TX related signals
-  output reg tx_full,               // Asserted once the tx_data is full
   output reg [WIDTH-1:0] tx_data,   // Holds tx_data to be sent to lm_TOP
 
   // RX related signals

@@ -81,10 +81,27 @@ assign uio_out[5] = DBG_OUT; assign uio_oe[5] = 1'b1;
 // MODULE INSTANSTIATION //
 ///////////////////////////
 
+wire rst_n_sync;
+reset_sync u_rst_sync(.clk(clk), .rst_n_async(rst_n), .rst_n(rst_n_sync));
 
 //////////////// SPI UNIT ////////////////////
 
+wire [15:0] rx_data, tx_data;
+wire tx_full;
 
+lm_SPI #(WIDTH=16) iSPI (
+    .clk(clk),
+    .rst_n(rst_n_sync),
+
+    .MOSI_async(MOSI),
+    .MISO(MISO),
+    .SCLK_async(SCLK),
+
+    .tx_data(tx_data),
+
+    .send_rx(DONE),
+    .rx_data(rx_data)
+);
 
 ////////////////////////////////////////////////
 
@@ -93,17 +110,17 @@ assign uio_out[5] = DBG_OUT; assign uio_oe[5] = 1'b1;
 // TODO: DEBUG UNIT
 ////////////////////////////////////////////////
 
-lm_phy_top iPHY #(WIDTH=16) (
+lm_phy_top #(WIDTH=16) iPHY (
 	.clk(clk),
-	.rst_n_async(rst_n),
+	.rst_n(rst_n_sync),
 
 	// TX chip side interface
-	.tx_in(tx_in),
+	.tx_in(tx_data),
 	.tx_load(LOAD),
 	.tx_done(DONE),
 
 	// RX chip side interface
-	.rx_out(/* TODO : SPI CONNECTION */),
+	.rx_out(rx_data),
 	.rx_vld(VLD),
 	.rx_rdy(RDY),
 
@@ -114,7 +131,7 @@ lm_phy_top iPHY #(WIDTH=16) (
 	// TX off chip interface
 	.RX(RX),
 	.RX_ACK(RX_ACK)
-    );
+);
 
 endmodule
 `default_nettype wire
