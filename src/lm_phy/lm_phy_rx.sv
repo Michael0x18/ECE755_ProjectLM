@@ -42,7 +42,7 @@ assign rx_shift_nodelay = |rx_pulse;
 //assign  rx_shift = #500ps rx_shift_nodelay;
 delayline #(50) dl2(.in(rx_shift_nodelay), .out(rx_shift));
 
-rx_fsm fsm(.clk(clk), .rst_n(rst_n), .rdy(rx_rdy), .vld(rx_vld), .rx_pulse(rx_shift), .ack_toggle(ack_toggle));
+rx_fsm #(WIDTH) fsm(.clk(clk), .rst_n(rst_n), .rdy(rx_rdy), .vld(rx_vld), .rx_pulse(rx_shift), .ack_toggle(ack_toggle));
 
 always @(posedge ack_toggle, negedge rst_n) begin
 	if(~rst_n) begin

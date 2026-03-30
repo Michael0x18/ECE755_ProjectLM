@@ -34,7 +34,7 @@ module rx_fsm #(WIDTH=64) (
   //solution: replace reset conditin with ~clr_vld?
   always @(posedge rx_pulse, negedge clr_vld) begin
     if (~clr_vld) begin
-      counter <= WIDTH;
+      counter <= WIDTH/2;
       vld <= 1'b0;
     end else begin
       counter <= counter - 1;
@@ -55,7 +55,7 @@ module rx_fsm #(WIDTH=64) (
   assign rdy_posedge = (rdy_ff[0] & ~rdy_ff[1]);
   pos_pulse_generator rdy_pulse_gen(.rx(rdy_posedge), .rx_pulse(rdy_pulse));
 
-  assign ack_toggle = (vld||counter==WIDTH) ? rdy_pulse : rx_pulse;
+  assign ack_toggle = (vld||counter==WIDTH/2) ? rdy_pulse : rx_pulse;
 
   assign clr_vld = rst_n & ~rdy_pulse;
 
