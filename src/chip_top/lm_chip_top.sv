@@ -84,51 +84,8 @@ assign uio_out[5] = DBG_OUT; assign uio_oe[5] = 1'b1;
 
 //////////////// SPI UNIT ////////////////////
 
-// Read In: SPI reads in 4 bits at a time (Most Significant Bit read in first)
-logic [3:0] SPI_shift_reg;
-logic [1:0] SPI_count;  // Counts 0 -> 3
-logic [3:0] next_shift;
-logic [3:0] tx_in;
-assign tx_in = {TX3, TX2, TX1, TX0};
-
-always_comb begin
-    next_shift = {SPI_shift_reg[2:0], MOSI};
-end
-always_ff @(posedge SCLK) begin
-    SPI_shift_reg <= next_shift;
-
-    if (SPI_count == 2'd3) begin
-        SPI_count <= 0;
-        
-        // Load SPI_shift_reg into TX after 4 bits recieved
-        // Use next_shift so don't have to wait one clk for SPI_shift_reg
-        // MSB first (MSB:LSB)
-        TX3 <= next_shift[3]; // MSB
-        TX2 <= next_shift[2];
-        TX1 <= next_shift[1];
-        TX0 <= next_shift[0];  // LSB
-        
-    end else begin
-        SPI_count <= SPI_count + 1;
-    end
-end
 
 
-// Write out: SPI reads out 4 bits at a time (Most Significant Bit read out first)
-logic [3:0] SPI_shift_out_reg;
-
-always_ff @(negedge SCLK) begin
-    // Load into shift register when data is valid
-    if (VLD) begin
-        SPI_shift_out_reg <= {RX3, RX2, RX1, RX0}; // MSB: LSB
-    
-    // Shift at next clk cycle
-    end else begin
-        MISO <= SPI_shift_out_reg[3];
-        SPI_shift_out_reg <= {SPI_shift_out_reg[2:0], 0};
-    end
-
-end
 ////////////////////////////////////////////////
 
 
