@@ -36,7 +36,7 @@ localparam WIDTH=16;
 
 
   //assume TB uses a width of 16. parameterize later
-  lm_phy_top #(16) iDUT (
+  lm_phy_top #(WIDTH) iDUT (
       .clk(clk),
       .rst_n(rst_n),
       .tx_in(tx_in),

@@ -35,10 +35,16 @@ module rx_fsm #(WIDTH=64) (
   always @(posedge rx_pulse, negedge clr_vld) begin
     if (~clr_vld) begin
       counter <= WIDTH/2;
-      vld <= 1'b0;
     end else begin
       counter <= counter - 1;
-      vld <= (counter == 5'h1);
+    end
+  end
+
+  always @(negedge rx_pulse, negedge clr_vld) begin
+    if (~clr_vld) begin
+      vld <= 1'b0;
+    end else begin
+      vld <= (counter == 5'h1 || counter == 5'h0);
     end
   end
 
