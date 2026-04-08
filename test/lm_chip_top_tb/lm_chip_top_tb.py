@@ -5,42 +5,25 @@ import random
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
-from cocotb.triggers import FallingEdge
+from cocotb.triggers import FallingEdge, RisingEdge
 
-######### IO of lm_SPI #############
-#   // clock and active low reset
-#   input wire clk,
-#   input wire rst_n,
-#   // Standard SPI signals
-#   input wire MOSI_async,
-#   output reg MISO,
-#   input wire SCLK_async,
-#   // TX related signals
-#   output reg [WIDTH-1:0] tx_data,   // Holds tx_data to be sent to lm_TOP
-#   // RX related signals
-#   input wire send_rx,               // Asserted by lm_TOP to initiate MISO line
-#   input wire [WIDTH-1:0] rx_data    // Holds rx_data to be sent out of board
 
 WIDTH = 16
 
 async def send_data(dut, data):
     
-    dut.MOSI_async.value = 1
+    dut.MOSI.value = 1
     
     for i in range(WIDTH):
         await FallingEdge(dut.SCLK)
-        dut.MOSI_async.value = (data >> i) & 0x1
+        dut.MOSI.value = (data >> i) & 0x1
     
     await FallingEdge(dut.SCLK)
     
-    dut.MOSI_async.value = 0
+    dut.MOSI.value = 0
     
-async def recieve_data(dut, data):
-    dut.rx_data.value = data
-    dut.send_rx.value = 1
-    
-    await ClockCycles(dut.clk, 1)
-    
+async def recieve_data(dut):
+
     val_arr = []
     
     for i in range(WIDTH):
@@ -57,16 +40,36 @@ async def recieve_data(dut, data):
     await FallingEdge(dut.SCLK)
     return val
 
+
+async def pulse(clk, signal):
+    await RisingEdge(clk)
+    signal.value = 1
+    await RisingEdge(clk)
+    signal.value = 0
+
+
+# async def run_test(dut, data):
+
 @cocotb.test()
 async def test_1(dut):
-    cocotb.log.info("start test 1")
-    #create the driving synchronous clock
-    # Start a 1GHz clock. This is still stupidly fast compared to what we're actually going to use
+
+    DATA = 0xBEEF
+
+    cocotb.log.info("Starting Test 1... Sending 0x%04X", DATA)
+
+
+    # Start a 1GHz driving sync clock. This is still stupidly fast compared to what we're actually going to use
     clock = Clock(dut.clk, 1,unit="ns")
     cocotb.start_soon(clock.start())
 
     dut.rst_n.value = 0
+    dut.MOSI.value = 0
+    dut.SCLK.value = 0
+    dut.CAPTURE.value = 0
     
+    dut.RDY.value = 0
+    dut.LOAD.value = 0
+
     await ClockCycles(dut.clk, 2)
     
     dut.rst_n.value = 1
@@ -77,5 +80,27 @@ async def test_1(dut):
     sclk = Clock(dut.SCLK, 20, unit='ns')
     cocotb.start_soon(sclk.start())
     
-    await ClockCycles(dut.clk, 100)
-    
+    # 1. Send data over SPI
+    await send_data(dut, 0xBEEF)
+
+    # 2. Pulse LOAD
+    cocotb.log.info("BEFORE pulse LOAD")
+    await pulse(dut.clk, dut.LOAD)
+
+    # 3. Wait for RX to assert VLD
+    cocotb.log.info("BEFORE wait VLD")
+    await RisingEdge(dut.VLD)
+
+    # 4. Pulse CAPTURE
+    cocotb.log.info("BEFORE pulse CAPTURE")
+    await pulse(dut.clk, dut.CAPTURE)
+
+    # 5. Pulse RDY
+    await pulse(dut.clk, dut.RDY)
+
+    # 6. Wait for TX to assert DONE
+    await RisingEdge(dut.DONE)
+
+    # 7. Output recieved data over SPI
+    recieved_data = await recieve_data(dut)
+    cocotb.log.info("Recieved: 0x%04X", recieved_data)
