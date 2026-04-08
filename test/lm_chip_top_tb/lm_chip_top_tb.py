@@ -18,8 +18,8 @@ from cocotb.triggers import FallingEdge
 #   // TX related signals
 #   output reg [WIDTH-1:0] tx_data,   // Holds tx_data to be sent to lm_TOP
 #   // RX related signals
-#   input reg send_rx,               // Asserted by lm_TOP to initiate MISO line
-#   input reg [WIDTH-1:0] rx_data    // Holds rx_data to be sent out of board
+#   input wire send_rx,               // Asserted by lm_TOP to initiate MISO line
+#   input wire [WIDTH-1:0] rx_data    // Holds rx_data to be sent out of board
 
 WIDTH = 16
 
