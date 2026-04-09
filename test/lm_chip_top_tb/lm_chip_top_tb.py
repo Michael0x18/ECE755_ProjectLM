@@ -5,7 +5,7 @@ import random
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
-from cocotb.triggers import FallingEdge, RisingEdge, Timer
+from cocotb.triggers import FallingEdge, RisingEdge, Timer, Edge
 
 
 WIDTH = 16
@@ -37,7 +37,7 @@ async def recieve_data(dut):
     for b in val_arr:
         val = (val << 1) | b
         
-    await FallingEdge(dut.SCLK)
+    await RisingEdge(dut.SCLK)
     return val
 
 
@@ -47,34 +47,50 @@ async def pulse(clk, signal):
     await RisingEdge(clk)
     signal.value = 0
 
-async def loopback(dut):
+
+
+async def loopback_tx(dut, delay_ns=5):
     while True:
+        await Edge(dut.TX)   # Wait for ANY change
+
         val = dut.TX.value
-        ack = dut.RX_ACK.value
+        # Launch delayed update (don’t block loop)
+        cocotb.start_soon(delayed_tx(dut, val, delay_ns))
 
-        
-        dut.RX.value = val
-        dut.TX_ACK.value = ack
-
-        await Timer(0.5, units="ns") # Brief wait so non-blocking
+        await Timer(0.1, units="ns") # Brief wait so non-blocking
 
 
-# async def run_test(dut, data):
+async def delayed_tx(dut, val, delay_ns):
+    await Timer(delay_ns, units="ns")
+    dut.RX.value = val
 
-@cocotb.test()
-async def test_1(dut):
 
-    DATA = 0xBEEF
+async def loopback_ack(dut, delay_ns=5):
+    while True:
+        await Edge(dut.RX_ACK)
 
-    cocotb.log.info("Starting Test 1... Sending 0x%04X", DATA)
+        val = dut.RX_ACK.value
+        # Launch delayed update (don’t block loop)
+        cocotb.start_soon(delayed_ack(dut, val, delay_ns))
 
+        await Timer(0.1, units="ns") # Brief wait so non-blocking
+
+
+async def delayed_ack(dut, val, delay_ns):
+    await Timer(delay_ns, units="ns")
+    dut.TX_ACK.value = val
+
+
+async def run_test(dut, data, delay_ns):
+    cocotb.log.info("Starting Test ... Sending 0x%04X", data)
 
     # Start a 1GHz driving sync clock. This is still stupidly fast compared to what we're actually going to use
     clock = Clock(dut.clk, 1,unit="ns")
     cocotb.start_soon(clock.start())
 
-    # Start loopback
-    cocotb.start_soon(loopback(dut))
+    # Start loopbacks
+    cocotb.start_soon(loopback_tx(dut, delay_ns))
+    cocotb.start_soon(loopback_ack(dut, delay_ns))
 
 
     dut.rst_n.value = 0
@@ -96,7 +112,7 @@ async def test_1(dut):
     cocotb.start_soon(sclk.start())
     
     # 1. Send data over SPI
-    await send_data(dut, 0xBEEF)
+    await send_data(dut, data)
 
     # 2. Pulse LOAD
     await pulse(dut.clk, dut.LOAD)
@@ -116,5 +132,26 @@ async def test_1(dut):
     # 7. Output recieved data over SPI
     recieved_data = await recieve_data(dut)
 
-    assert recieved_data == DATA, f"Expected 0x{DATA:04X}, got 0x{recieved_data:04X}"
+    assert recieved_data == data, f"Expected 0x{data:04X}, got 0x{recieved_data:04X}"
     cocotb.log.info("Recieved: 0x%04X", recieved_data)
+
+
+
+@cocotb.test()
+async def test_1(dut):
+
+    DATA = 0xBEEF
+    DELAY_ns = 1
+
+    await run_test(dut, DATA, DELAY_ns)
+
+
+@cocotb.test()
+async def test_2(dut):
+
+    DATA = 0xB00F
+    DELAY_ns = 1
+
+    await run_test(dut, DATA, DELAY_ns)
+
+   
