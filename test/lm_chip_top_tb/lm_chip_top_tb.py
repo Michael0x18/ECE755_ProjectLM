@@ -5,7 +5,7 @@ import random
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
-from cocotb.triggers import FallingEdge, RisingEdge
+from cocotb.triggers import FallingEdge, RisingEdge, Timer
 
 
 WIDTH = 16
@@ -47,6 +47,17 @@ async def pulse(clk, signal):
     await RisingEdge(clk)
     signal.value = 0
 
+async def loopback(dut):
+    while True:
+        val = dut.TX.value
+        ack = dut.RX_ACK.value
+
+        
+        dut.RX.value = val
+        dut.TX_ACK.value = ack
+
+        await Timer(0.5, units="ns") # Brief wait so non-blocking
+
 
 # async def run_test(dut, data):
 
@@ -61,6 +72,10 @@ async def test_1(dut):
     # Start a 1GHz driving sync clock. This is still stupidly fast compared to what we're actually going to use
     clock = Clock(dut.clk, 1,unit="ns")
     cocotb.start_soon(clock.start())
+
+    # Start loopback
+    cocotb.start_soon(loopback(dut))
+
 
     dut.rst_n.value = 0
     dut.MOSI.value = 0
@@ -84,15 +99,12 @@ async def test_1(dut):
     await send_data(dut, 0xBEEF)
 
     # 2. Pulse LOAD
-    cocotb.log.info("BEFORE pulse LOAD")
     await pulse(dut.clk, dut.LOAD)
 
     # 3. Wait for RX to assert VLD
-    cocotb.log.info("BEFORE wait VLD")
     await RisingEdge(dut.VLD)
 
     # 4. Pulse CAPTURE
-    cocotb.log.info("BEFORE pulse CAPTURE")
     await pulse(dut.clk, dut.CAPTURE)
 
     # 5. Pulse RDY
@@ -103,4 +115,6 @@ async def test_1(dut):
 
     # 7. Output recieved data over SPI
     recieved_data = await recieve_data(dut)
+
+    assert recieved_data == DATA, f"Expected 0x{DATA:04X}, got 0x{recieved_data:04X}"
     cocotb.log.info("Recieved: 0x%04X", recieved_data)
