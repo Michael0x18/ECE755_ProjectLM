@@ -20,5 +20,5 @@ make run-all
 
 To view the output waveform, run:
 ```bash
-gtkwave (testbench_name).vcd
+gtkwave (testbench dir name)/(testbench_name).vcd
 ```

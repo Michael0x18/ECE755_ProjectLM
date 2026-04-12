@@ -1,6 +1,6 @@
 `default_nettype none
 
-module lm_SPI #(WIDTH = 64) (
+module lm_SPI #(parameter WIDTH = 64) (
   // clock and active low reset
   input wire clk,
   input wire rst_n,
@@ -14,8 +14,8 @@ module lm_SPI #(WIDTH = 64) (
   output reg [WIDTH-1:0] tx_data,   // Holds tx_data to be sent to lm_TOP
 
   // RX related signals
-  input reg send_rx,               // Asserted by lm_TOP to initiate MISO line
-  input reg [WIDTH-1:0] rx_data    // Holds rx_data to be sent out of board
+  input wire send_rx,               // Asserted by lm_TOP to initiate MISO line
+  input wire [WIDTH-1:0] rx_data    // Holds rx_data to be sent out of board
 );
 
 reg SCLK_flop, SCLK, SCLK_edge;
