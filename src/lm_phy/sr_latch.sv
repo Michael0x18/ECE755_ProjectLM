@@ -1,8 +1,10 @@
 `default_nettype none
 //TODO: add some delay lol so it doesn't
 module sr(input wire S, input wire R, output wire Q, output wire Q_n);
+/* verilator lint_off NEEDTIMINGOPT */
     nor #(1ps,1ps)n1(Q, R, Q_n);
     nor #(1ps,1ps)n2(Q_n, S, Q);
+/* verilator lint_on NEEDTIMINGOPT */
 //             ___
 // S ----------\  \           _
 //              )  )o------+--Q

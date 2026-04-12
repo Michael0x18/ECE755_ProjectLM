@@ -147,6 +147,8 @@ always @(posedge clk, negedge rst_n) begin
   end else if (rx_capture) begin
     rx_buf <= rx_data;
   end
+else if(SCLK_posedge & rx_shift_en)
+    rx_buf <= {1'b0, rx_buf[WIDTH-1:1]};
 end
 
 always @(posedge clk, negedge rst_n) begin
@@ -155,7 +157,6 @@ always @(posedge clk, negedge rst_n) begin
   end
   else if (SCLK_posedge & rx_shift_en) begin
     MISO <= rx_buf[0];
-    rx_buf <= {1'b0, rx_buf[WIDTH-1:1]};
     rx_bit_cnt <= rx_bit_cnt + 1;
   end
   else if (SCLK_posedge) begin
