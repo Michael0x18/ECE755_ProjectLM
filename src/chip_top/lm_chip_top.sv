@@ -5,7 +5,7 @@
  * and connects them to the phy components. Additionally houses test FFs to bring out signals.
  */
 
-module lm_chip_top (
+module tt_um_lm_chip_top (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
