@@ -7,7 +7,7 @@ module clock_gate_low(
 reg q_L;
 // Infer latch
 // should use integrated clock gate from std cel library
-always @(en, clk) begin
+always_latch begin
     if(~clk) begin
         q_L = en;
     end

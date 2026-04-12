@@ -10,6 +10,7 @@ always_comb begin
 		4'b0010: out = 2'h1;
 		4'b0100: out = 2'h2;
 		4'b1000: out = 2'h3;
+		default: out = 2'h0;
 	endcase
 end
 endmodule
