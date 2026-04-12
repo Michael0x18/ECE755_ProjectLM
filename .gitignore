@@ -18,3 +18,5 @@ __pycache__/
 src/config_merged.json
 src/user_config.json
 runs
+.*.stamp
+ports.json

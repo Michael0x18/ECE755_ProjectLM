@@ -33,7 +33,7 @@ logic [7:0] uio_oe;
 
 assign DBG_OUT = uio_out[5];
 
-lm_chip_top iDUT (
+tt_um_lm_chip_top iDUT (
     .ui_in({MOSI, RDY, LOAD, TX_ACK, RX}),    // Dedicated inputs
     .uo_out({MISO, VLD, DONE, RX_ACK, TX}),   // Dedicated outputs
     .uio_in({CAPTURE, SCLK, 1'b0, 1'b0, DBG_ADDR}),   // IOs: Input path
