@@ -4,8 +4,7 @@
  * Top level module to tape out. Instantiates SPI input/output buffers for external communication
  * and connects them to the phy components. Additionally houses test FFs to bring out signals.
  */
-
-module lm_chip_top (
+module tt_um_lm_chip_top (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
@@ -103,6 +102,16 @@ lm_SPI #(16) iSPI (
 //////////////// DEBUG UNIT ////////////////////
 // TODO: DEBUG UNIT
 ////////////////////////////////////////////////
+
+///////////// UNASSIGNED PORTS /////////////////
+// Delete any assign statements here as needed
+// This is just required for yosys to complete
+////////////////////////////////////////////////
+
+assign uio_out[4:0] = 5'b0;
+assign uio_out[7:6] = 2'b0;
+assign uio_oe[4] = 1'b0;
+assign DBG_OUT = 1'b0;
 
 /////////////////// LM PHY /////////////////////
 
