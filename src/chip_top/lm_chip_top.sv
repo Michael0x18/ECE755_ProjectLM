@@ -19,25 +19,25 @@ module tt_um_lm_chip_top (
 // Wires and Regs //
 ////////////////////
 
-logic MISO;
-wire MOSI;
-wire SCLK;
-wire CAPTURE;
-
-wire RDY;
-wire VLD;
-wire LOAD;
-wire DONE;
-
-logic [3:0] TX;
-
-logic [3:0] RX;
-
-wire TX_ACK;
-wire RX_ACK;
-
-wire [3:0] DBG_ADDR;
-wire DBG_OUT;
+(*DONT_TOUCH*)logic MISO;
+(*DONT_TOUCH*)wire MOSI;
+(*DONT_TOUCH*)wire SCLK;
+(*DONT_TOUCH*)wire CAPTURE;
+(*DONT_TOUCH*)
+(*DONT_TOUCH*)wire RDY;
+(*DONT_TOUCH*)wire VLD;
+(*DONT_TOUCH*)wire LOAD;
+(*DONT_TOUCH*)wire DONE;
+(*DONT_TOUCH*)
+(*DONT_TOUCH*)logic [3:0] TX;
+(*DONT_TOUCH*)
+(*DONT_TOUCH*)wire [3:0] RX;
+(*DONT_TOUCH*)
+(*DONT_TOUCH*)wire TX_ACK;
+(*DONT_TOUCH*)wire RX_ACK;
+(*DONT_TOUCH*)
+(*DONT_TOUCH*)wire [3:0] DBG_ADDR;
+(*DONT_TOUCH*)wire DBG_OUT;
 
 ////////////////////////////////////////
 // TTSKY130 pins <-> internal signals //
@@ -82,7 +82,7 @@ reset_sync u_rst_sync(.clk(clk), .rst_n_async(rst_n), .rst_n(rst_n_sync));
 
 wire [15:0] rx_data, tx_data;
 
-lm_SPI #(16) iSPI (
+(*DONT_TOUCH*)lm_SPI #(16) iSPI (
     .clk(clk),
     .rst_n(rst_n_sync),
 

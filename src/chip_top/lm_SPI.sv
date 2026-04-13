@@ -60,7 +60,7 @@ always @(posedge clk, negedge rst_n) begin
   end
 end
 
-reg tx_shift_en, tx_full;
+logic tx_shift_en, tx_full;
 reg [$clog2(WIDTH):0] tx_bit_cnt;
 
 always @* begin
@@ -116,7 +116,7 @@ always @(posedge clk, negedge rst_n) begin
   end
 end
 
-reg rx_shift_en, rx_empty, rx_capture;
+logic rx_shift_en, rx_empty, rx_capture;
 reg [$clog2(WIDTH):0] rx_bit_cnt;
 
 always @* begin

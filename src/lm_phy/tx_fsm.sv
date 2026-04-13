@@ -18,7 +18,7 @@ module tx_fsm #(parameter WIDTH = 64)(
 reg[$clog2(WIDTH/2):0] counter;
 
 reg load_edge;
-reg loaded;
+logic loaded;
 
 /////////////////////////
 // Load Edge Detection //
