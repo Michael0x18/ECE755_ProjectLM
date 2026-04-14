@@ -141,7 +141,7 @@ async def run_test(dut, data, delay_ns):
 async def test_1(dut):
 
     DATA = 0xBEEF
-    DELAY_ns = 1
+    DELAY_ns = 4
 
     await run_test(dut, DATA, DELAY_ns)
 
