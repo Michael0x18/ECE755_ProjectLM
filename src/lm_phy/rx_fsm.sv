@@ -66,7 +66,13 @@ module rx_fsm #(WIDTH=64) (
 
   assign clr_vld = rst_n & ~rdy_pulse;
 
-  assign vld = hold_ack && (counter==0);
+  always @(posedge clk, negedge rst_n) begin
+    if(~rst_n) begin
+      vld <= 1'b0;
+    end else begin
+      vld <= hold_ack && (counter==0);
+    end
+  end
 
 endmodule
 `default_nettype wire
