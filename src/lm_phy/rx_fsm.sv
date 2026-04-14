@@ -22,6 +22,7 @@ module rx_fsm #(WIDTH=64) (
     output wire ack_toggle
 );
 
+  reg hold_ack;
   wire clr_vld;
   reg [$clog2(WIDTH):0] counter;
   wire data_done;
@@ -42,9 +43,9 @@ module rx_fsm #(WIDTH=64) (
 
   always @(negedge rx_pulse, negedge clr_vld) begin
     if (~clr_vld) begin
-      vld <= 1'b0;
+      hold_ack <= 1'b0;
     end else begin
-      vld <= (counter == 5'h1 || counter == 5'h0);
+      hold_ack <= (counter == 5'h1 || counter == 5'h0);
     end
   end
 
@@ -61,9 +62,11 @@ module rx_fsm #(WIDTH=64) (
   assign rdy_posedge = (rdy_ff[0] & ~rdy_ff[1]);
   pos_pulse_generator rdy_pulse_gen(.rx(rdy_posedge), .rx_pulse(rdy_pulse));
 
-  assign ack_toggle = (vld||counter==WIDTH/2) ? rdy_pulse : rx_pulse;
+  assign ack_toggle = (hold_ack||counter==WIDTH/2) ? rdy_pulse : rx_pulse;
 
   assign clr_vld = rst_n & ~rdy_pulse;
+
+  assign vld = hold_ack && (counter==0);
 
 endmodule
 `default_nettype wire
