@@ -81,7 +81,7 @@ async def delayed_ack(dut, val, delay_ns):
     dut.TX_ACK.value = val
 
 
-async def run_test(dut, data, delay_ns):
+async def run_test(dut, data, delay_ns, reset=True):
     cocotb.log.info("Starting Test ... Sending 0x%04X", data)
 
     # Start a 1GHz driving sync clock. This is still stupidly fast compared to what we're actually going to use
@@ -93,7 +93,8 @@ async def run_test(dut, data, delay_ns):
     cocotb.start_soon(loopback_ack(dut, delay_ns))
 
 
-    dut.rst_n.value = 0
+    if(reset):
+        dut.rst_n.value = 0
     dut.MOSI.value = 0
     dut.SCLK.value = 0
     dut.CAPTURE.value = 0
@@ -152,6 +153,6 @@ async def test_2(dut):
     DATA = 0xB00F
     DELAY_ns = 1
 
-    await run_test(dut, DATA, DELAY_ns)
+    await run_test(dut, DATA, DELAY_ns, reset=False)
 
    
