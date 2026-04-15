@@ -20,3 +20,4 @@ src/user_config.json
 runs
 .*.stamp
 ports.json
+test-out

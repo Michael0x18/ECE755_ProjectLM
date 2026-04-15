@@ -14,10 +14,10 @@ module tx_shift_reg_tb ();
   wire [63:0] load_data;
   wire shift_clk;
   wire [1:0] shift_data;
-  wire load_clk;
+  wire load_clk_gated;
 
   tx_shift_reg iDUT(
-    .load_clk(load_clk),
+    .load_clk_gated(load_clk_gated),
     .rst_n(rst_n),
     .load_en(load_en),
     .load_data(load_data),

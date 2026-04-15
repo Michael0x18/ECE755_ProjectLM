@@ -2,6 +2,7 @@
 .SILENT:
 SHELL = bash
 MAKEFLAGS += -j4
+MAKEFLAGS += --no-print-directory
 
 VENV_DIR 	?= long_man_venv
 PYTHON 		:= $(shell command -v python3.13 2>/dev/null || command -v python3)
@@ -12,20 +13,17 @@ PDK 			?= sky130A
 .PHONY: all help
 all: help
 
-help: SHELL=perl
-help: .SHELLFLAGS=-e
 help:
-	print <<~ 'EOF';
-	Usage: make [command]
-	
-	Commands:
-	  venv            Create the python virtual environment
-	  pdk             (runs venv) Download the sky130 pdk
-	  librelane       (runs venv) Run the LibreLane flow
-	                  Run with 'env CONTAINER=...' to set container
-	                  Defaults to rootless Podman
-	  klayout         Open GDS in KLayout (only if librelane successful)
-	EOF
+	echo "Usage: make [command]"
+	echo 
+	echo "Commands:"
+	echo "  venv            Create the python virtual environment"
+	echo "  test            Run all Cocotb tests"
+	echo "  pdk             Download the sky130 pdk"
+	echo "  librelane       Run Tiny Tapeout's LibreLane flow"
+	echo "                  Run with 'env CONTAINER=...' to set container"
+	echo "                  Defaults to rootless Podman"
+	echo "  klayout         Open GDS in KLayout (only if librelane successful)"
 
 venv: $(PIP)
 
@@ -53,9 +51,13 @@ $(PDK_ROOT)/ciel/sky130/versions/*/sky130A/libs.ref/sky130_fd_sc_hd/verilog/prim
 	} >/dev/null 2>&1
 	echo "PDK installed successfully"
 
+.PHONY: test
+test: | $(PIP)
+	$(MAKE) -C $@ run-all 2>/dev/null
+
 .PHONY: clean
 clean:
-	-rm -rf $(VENV_DIR) $(PDK_ROOT) runs .*.stamp ports.json
+	-rm -rf $(VENV_DIR) $(PDK_ROOT) runs .*.stamp ports.json test-out
 	git submodule deinit --all -f >/dev/null 2>&1
 	$(MAKE) -C test $@ >/dev/null 2>&1
 
