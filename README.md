@@ -1,10 +1,41 @@
 # Project LM
+> [!CAUTION]
+> While this flow works on our own machines, errors are very common.\
+> You are on your own if you encounter any errors while replicating.
 
-## Setup
-Make sure you have at least **Python3.13** installed and the following dependencies: 
+> [!WARNING]
+> This flow was executed on Linux/x86 and MacOS Sequoia.\
+> We cannot guarantee this flow will work for Windows or other OSes.
+
+## Dependencies
+### Linux
+- make
+- gtkwave
+- iverilog        (or other RTL simulator. See section 3 for more details)
+- podman          (or other Container software. See section 2 for details)
+- python3.13
+- python3.13-dev  (on Ubuntu only(?))
+
+ArchLinux:
 ```bash
-sudo apt install python3.13-dev
-sudo apt install podman
+yay -Syu make gtkwave iverilog podman python313
+```
+
+Ubuntu:
+```bash
+sudo apt install make gtkwave iverilog podman python3.13 python3.13-dev
+```
+
+### MacOS (via Brew)
+- gmake           (aliasing make=gmake will only make your life easier)
+- gtkwave
+- iverilog        (or other RTL simulator. See section 3 for more details)
+- klayout         (Python's KLayout doesn't work on MacOS)
+- podman          (or other Container software. See section 2 for details)
+- python          (latest - 3.9.X - seems to work fine)
+
+```bash
+brew install gmake iverilog podman python --cask gtkwave klayout
 ```
 
 ## Using the Makefile
@@ -35,6 +66,11 @@ This can cause many unexpected errors, thus is recommended to run at your own pr
 
 ### KLayout GDS Viewing
 Running `make klayout` will open the GDS file with the python version of KLayout only if `make librelane` was successful.
+
+> [!WARNING]
+> The Python version of KLayout doesn't seem to work on MacOS. Instead, you must install KLayout locally and then
+> open the file ./runs/wokwi/final/klayout_gds/*.gds inside KLayout. Note that MacOS thinks it's an insecure app
+> by default, so you must allow opening in the privacy and security settings. The same for GTKWave.
 
 ## More on Testbenches
 For more controlled testing, CD into the `./test` directory (`cd test`). Note that you **do not** need to source the Python virtual environment before doing so. The internal Makefile will handle that for you.\
