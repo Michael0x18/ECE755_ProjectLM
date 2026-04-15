@@ -1,38 +1,69 @@
 # Project LM
 
 ## Setup
-1. Make sure you have at least **Python3.13** installed and the following dependencies: 
-    ```bash
-    sudo apt install python3.13-dev
-    sudo apt install podman
-    ```
-2. Pull in submodules: `git submodule update --init --recursive`.
-3. Run `make venv` to setup the virtual environment.
-4. Source the venv: `source long_man_venv/bin/activate`
-
-## Running Testbenches
-(WIP!) Run `make test` to run all testbenches simutaneously.
-
-To run one test at a time, activate the python virtual environment (`source long_man_venv/bin/activate` if on sh/bash/zsh or `source long_man_venv/bin/activate.fish` if on fish), then run the following command inside the `test/` directory
+Make sure you have at least **Python3.13** installed and the following dependencies: 
 ```bash
-# This command will run one specific test
-make (testbench dir name)
+sudo apt install python3.13-dev
+sudo apt install podman
+```
 
-# If you are using questa, you can instead run this for one specific test
+## Using the Makefile
+By running `make` or `make help`, you will see a list and small description of the following runnable commands.
+
+### Virtual Environment
+Running `make venv` will intialize the Python virtual environment.\
+This target is a prerequisite to all other targets, so it will be run regardless.
+
+### Testing
+Running `make test` will run all testbenches simultaneously and dump their outputs into `./test-out/`.\
+Running `env DBG=1 make test` will output everything to stdout and stderr instead.\
+More information on testbenches in the next section.
+
+### Process Design Kit
+Running `make pdk` will download the Skywater 130nm PDK from the *ciel* library into `./sky130pdk/`.\
+This target is needed for gate level testing and is a prerequisite to the following targets.
+
+### Tiny Tapeout's LibreLane Flow
+Running `make librelane` will pull the Tiny Tapeout's local hardenning GitHub as a submodule.\
+It will then run the LibreLane flow. This will take a while for the first run to download all prerequisites. Subsequent runs will be shorter, but still a couple minutes.\
+This can cause many unexpected errors, thus is recommended to run at your own precation.
+
+### KLayout GDS Viewing
+Running `make klayout` will open the GDS file with the python version of KLayout only if `make librelane` was successful.
+
+## More on Testbenches
+For more controlled testing, CD into the `./test` directory (`cd test`). Note that you **do not** need to source the Python virtual environment before doing so. The internal Makefile will handle that for you.\
+You now have access to the following commands.
+```bash
+# Run a single test bench and output to ../test-out/(testbench directory name).out
+make (testbench directory name)
+
+# To output to stdout and stderr, set the DBG environment to anything
+env DBG=1 make (testbench directory name)
+
+# If you are using another RTL simulator, set the SIM environment variable
+# e.g., to run with QuestaSim
 make SIM=questa (testbench dir name)
 
-# This command will run all testbenches
+# Run all testbenches at once (max parallel by default)
 make run-all
+
+# If you plan on setting DBG with run-all, it is highly recommended to disable parallel
+env DBG=1 make -j1 run-all
+
+# (WIP) Run a gate level simulation instead of RTL simulation
+make (testbench directory name)-gates
+# or
+env GATES=yes PDK_ROOT=../sky130pdk make (testbench directory name)
+
+# Currently, gate level simulation only works on lm_chip_top_tb once
+# the LibreLane flow is successful.
 ```
 
-To view the output waveform, run:
+To view the output waveform for any testbench, run:
 ```bash
-gtkwave (testbench dir name)/(testbench_name).vcd
+make (testbench directory name)-waves
+# or
+gtkwave (testbench directory name)/(testbench_name).vcd
 ```
 
-
-## Synthesizing
-```bash
-make librelane
-make klayout # Open the layout if librelane passes
-```
