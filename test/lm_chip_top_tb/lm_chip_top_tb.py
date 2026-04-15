@@ -2,13 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import random
+import itertools
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 from cocotb.triggers import FallingEdge, RisingEdge, Timer
 from cocotb.regression import TestFactory  
 
-# GLOBAL
+# GLOBALs
 WIDTH = 16
 _initialization = True
 _rx_state = 0  # Needs to be shared between async busses
@@ -100,11 +101,12 @@ async def reset_n(dut):
     dut.rst_n.value = 0
 
 
-async def run_test(dut, data, tx_delays_ns, ack_delay_ns):
-    cocotb.log.info("Starting Test ... Sending 0x%04X", data)
+async def run_test(dut, data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns):
+    cocotb.log.info("Sending 0x%04X | clk=%sns sclk=%sns tx_delays=%sns ack_delay=%sns",
+                    data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns)
 
     # Start a 1GHz driving sync clock. This is still stupidly fast compared to what we're actually going to use
-    clock = Clock(dut.clk, 1,  unit="ns")
+    clock = Clock(dut.clk, clk_ns,  unit="ns")
     cocotb.start_soon(clock.start())
 
     # Start loopbacks
@@ -126,7 +128,7 @@ async def run_test(dut, data, tx_delays_ns, ack_delay_ns):
     await ClockCycles(dut.clk, 2)
     
     
-    sclk = Clock(dut.SCLK, 20, unit='ns')
+    sclk = Clock(dut.SCLK, sclk_ns, unit='ns')
     cocotb.start_soon(sclk.start())
     
     # 1. Send data over SPI
@@ -155,17 +157,28 @@ async def run_test(dut, data, tx_delays_ns, ack_delay_ns):
 
 
    
-async def loopback_test(dut, data, tx_delays_ns, ack_delay_ns):
+async def loopback_test(dut, data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns):
     global _initialization
     if _initialization:
         await reset_n(dut) 
         _initialization = False
     
-    await run_test(dut, data, tx_delays_ns, ack_delay_ns)
+    await run_test(dut, data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns)
+
+
+################################# TESTS #################################
+# DATA = [0xB00F, 0xDEAD, 0x1234]
+DATA = [random.randint(0, 0xFFFF) for _ in range(5)]
+# CLOCKS = [16, 63, 125, 250, 500, 1000]  # 62.5 MHz to 1 MHz
+# DELAYS = [1, 10, 100, 1000]  # 1 ns to 1 us
+CLOCKS = [16, 1000]  # 62.5 MHz to 1 MHz
+DELAYS = [1, 1000]  # 1 ns to 1 us
+LINE_DELAYS = list(set(itertools.product(DELAYS, repeat=4)))
 
 tf = TestFactory(test_function=loopback_test)
-
-tf.add_option("data",     [0xB00F, 0xDEAD, 0x1234])
-tf.add_option("tx_delays_ns", [[4, 4, 4, 4]])
-tf.add_option("ack_delay_ns", [4])
+tf.add_option("data", DATA) 
+tf.add_option("clk_ns", CLOCKS)  # 62.5 MHz to 1 MHz
+tf.add_option("sclk_ns", CLOCKS) # 62.5 MHz to 1 MHz
+tf.add_option("tx_delays_ns", LINE_DELAYS)
+tf.add_option("ack_delay_ns", DELAYS)  
 tf.generate_tests()
