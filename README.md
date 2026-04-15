@@ -27,7 +27,7 @@ This target is needed for gate level testing and is a prerequisite to the follow
 > [!WARNING]
 > You must have rootless Podman or rootless Docker to run this LibreLane flow.\
 > For Podman, start podman.socket with SystemD or follow [Podman's official tutorial.](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md)\
-> For Docker, you must add yourseld to the docker group with `groupadd docker; sudo usermod -aG docker $USER`. Read more from [Docker themself.](https://docs.docker.com/engine/security/rootless/)
+> For Docker, you must add yourself to the docker group with `groupadd docker; sudo usermod -aG docker $USER`. Read more from [Docker themself.](https://docs.docker.com/engine/security/rootless/)
 
 Running `make librelane` will pull the Tiny Tapeout's local hardenning GitHub as a submodule.\
 It will then run the LibreLane flow. This will take a while for the first run to download all prerequisites. Subsequent runs will be shorter, but still a couple minutes.\
