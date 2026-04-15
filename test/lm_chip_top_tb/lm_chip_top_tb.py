@@ -5,10 +5,14 @@ import random
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
-from cocotb.triggers import FallingEdge, RisingEdge, Timer, Edge
+from cocotb.triggers import FallingEdge, RisingEdge, Timer
+from cocotb.regression import TestFactory  
 
-
+# GLOBAL
 WIDTH = 16
+_initialization = True
+_rx_state = 0  # Needs to be shared between async busses
+
 
 async def send_data(dut, data):
     
@@ -48,21 +52,32 @@ async def pulse(clk, signal):
     signal.value = 0
 
 
-
-async def loopback_tx(dut, delay_ns=5):
+async def loopback_tx(dut, delays_ns=[5,5,5,5]):
+    DATA_LINES = 4
     while True:
         await dut.TX.value_change   # Wait for ANY change
 
         val = dut.TX.value
         # Launch delayed update (don’t block loop)
-        cocotb.start_soon(delayed_tx(dut, val, delay_ns))
-
+        for i in range(DATA_LINES):                                                                                                                                                                                                                                                                        
+              bit = (int(dut.TX.value) >> i) & 1
+              cocotb.start_soon(delayed_tx_line(dut, i, bit, delays_ns[i]))   
+        
         await Timer(0.1, unit="ns") # Brief wait so non-blocking
 
 
-async def delayed_tx(dut, val, delay_ns):
-    await Timer(delay_ns, unit="ns")
-    dut.RX.value = val
+async def delayed_tx_line(dut, bit_idx, val, delay_ns):                                                                                                                                                                                                                                           
+    global _rx_state                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                             
+    await Timer(delay_ns, units="ns")     
+
+    if val:
+        # Set bit                                                                                                                                                                                                                                                                                       
+        _rx_state |= (1 << bit_idx)                                                                                                                                                                                                                                                             
+    else:     
+        # Clear bit                          
+        _rx_state &= ~(1 << bit_idx)
+    dut.RX.value = _rx_state  
 
 
 async def loopback_ack(dut, delay_ns=5):
@@ -81,20 +96,22 @@ async def delayed_ack(dut, val, delay_ns):
     dut.TX_ACK.value = val
 
 
-async def run_test(dut, data, delay_ns, reset=True):
+async def reset_n(dut):
+    dut.rst_n.value = 0
+
+
+async def run_test(dut, data, tx_delays_ns, ack_delay_ns):
     cocotb.log.info("Starting Test ... Sending 0x%04X", data)
 
     # Start a 1GHz driving sync clock. This is still stupidly fast compared to what we're actually going to use
-    clock = Clock(dut.clk, 1,unit="ns")
+    clock = Clock(dut.clk, 1,  unit="ns")
     cocotb.start_soon(clock.start())
 
     # Start loopbacks
-    cocotb.start_soon(loopback_tx(dut, delay_ns))
-    cocotb.start_soon(loopback_ack(dut, delay_ns))
+    cocotb.start_soon(loopback_tx(dut, tx_delays_ns))
+    cocotb.start_soon(loopback_ack(dut, ack_delay_ns))
 
 
-    if(reset):
-        dut.rst_n.value = 0
     dut.MOSI.value = 0
     dut.SCLK.value = 0
     dut.CAPTURE.value = 0
@@ -137,32 +154,18 @@ async def run_test(dut, data, delay_ns, reset=True):
     cocotb.log.info("Recieved: 0x%04X", recieved_data)
 
 
-# @cocotb.test()
-# async def test_0(dut):
-
-#     DATA = 0xB00F
-#     DELAY_ns = 4
-
-#     await run_test(dut, DATA, DELAY_ns, reset=False)
-
-
-@cocotb.test()
-async def test_1(dut):
-
-    DATA = 0xBEEF
-    DELAY_ns = 4
-
-    await run_test(dut, DATA, DELAY_ns)
-
-
-
-
-@cocotb.test()
-async def test_2(dut):
-
-    DATA = 0xB00F
-    DELAY_ns = 2
-
-    await run_test(dut, DATA, DELAY_ns, reset=False)
-
    
+async def loopback_test(dut, data, tx_delays_ns, ack_delay_ns):
+    global _initialization
+    if _initialization:
+        await reset_n(dut) 
+        _initialization = False
+    
+    await run_test(dut, data, tx_delays_ns, ack_delay_ns)
+
+tf = TestFactory(test_function=loopback_test)
+
+tf.add_option("data",     [0xB00F, 0xDEAD, 0x1234])
+tf.add_option("tx_delays_ns", [[4, 4, 4, 4]])
+tf.add_option("ack_delay_ns", [4])
+tf.generate_tests()
