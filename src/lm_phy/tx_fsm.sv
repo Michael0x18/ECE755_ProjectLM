@@ -47,12 +47,12 @@ assign fsm_clk = load_clk | ack_pulse;
 
 always_ff @(posedge fsm_clk, negedge rst_n) begin
   if (~rst_n) begin
-    counter <= (WIDTH/2)-1;
+    counter <= ($bits(counter))'(WIDTH/2)-1;
     done <= 1'b0;
   end
 
   else if (load) begin
-    counter <= (WIDTH/2)-1;
+    counter <= ($bits(counter))'(WIDTH/2)-1;
     done <= 1'b0;
   end
 

@@ -1,5 +1,4 @@
 `default_nettype none
-//TODO: add some delay lol so it doesn't
 module sr(input wire S, input wire R, output reg Q, output reg Q_n);
     // nor #(1ps)n1(Q, R, Q_n);
     // nor #(1ps)n2(Q_n, S, Q);
