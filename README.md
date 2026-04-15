@@ -43,7 +43,7 @@ env DBG=1 make (testbench directory name)
 
 # If you are using another RTL simulator, set the SIM environment variable
 # e.g., to run with QuestaSim
-make SIM=questa (testbench dir name)
+env SIM=questa make (testbench dir name)
 
 # Run all testbenches at once (max parallel by default)
 make run-all
