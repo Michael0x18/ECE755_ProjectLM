@@ -1,3 +1,5 @@
+.ONESHELL:
+.SILENT:
 
 PDK_ROOT := $(PWD)/../sky130pdk
 
@@ -19,3 +21,6 @@ $(TESTBENCHES):
 
 %-waves:
 	$(MAKE) -C $* waves
+
+clean:
+	-rm -rf */__pycache__ */results.xml */*.vcd */sim_build
