@@ -51,33 +51,33 @@ async def pulse(clk, signal):
 
 async def loopback_tx(dut, delay_ns=5):
     while True:
-        await Edge(dut.TX)   # Wait for ANY change
+        await dut.TX.value_change   # Wait for ANY change
 
         val = dut.TX.value
         # Launch delayed update (don’t block loop)
         cocotb.start_soon(delayed_tx(dut, val, delay_ns))
 
-        await Timer(0.1, units="ns") # Brief wait so non-blocking
+        await Timer(0.1, unit="ns") # Brief wait so non-blocking
 
 
 async def delayed_tx(dut, val, delay_ns):
-    await Timer(delay_ns, units="ns")
+    await Timer(delay_ns, unit="ns")
     dut.RX.value = val
 
 
 async def loopback_ack(dut, delay_ns=5):
     while True:
-        await Edge(dut.RX_ACK)
+        await dut.RX_ACK.value_change
 
         val = dut.RX_ACK.value
         # Launch delayed update (don’t block loop)
         cocotb.start_soon(delayed_ack(dut, val, delay_ns))
 
-        await Timer(0.1, units="ns") # Brief wait so non-blocking
+        await Timer(0.1, unit="ns") # Brief wait so non-blocking
 
 
 async def delayed_ack(dut, val, delay_ns):
-    await Timer(delay_ns, units="ns")
+    await Timer(delay_ns, unit="ns")
     dut.TX_ACK.value = val
 
 
@@ -98,7 +98,7 @@ async def run_test(dut, data, delay_ns, reset=True):
     dut.MOSI.value = 0
     dut.SCLK.value = 0
     dut.CAPTURE.value = 0
-    
+
     dut.RDY.value = 0
     dut.LOAD.value = 0
 
@@ -137,6 +137,14 @@ async def run_test(dut, data, delay_ns, reset=True):
     cocotb.log.info("Recieved: 0x%04X", recieved_data)
 
 
+# @cocotb.test()
+# async def test_0(dut):
+
+#     DATA = 0xB00F
+#     DELAY_ns = 4
+
+#     await run_test(dut, DATA, DELAY_ns, reset=False)
+
 
 @cocotb.test()
 async def test_1(dut):
@@ -147,11 +155,13 @@ async def test_1(dut):
     await run_test(dut, DATA, DELAY_ns)
 
 
+
+
 @cocotb.test()
 async def test_2(dut):
 
     DATA = 0xB00F
-    DELAY_ns = 1
+    DELAY_ns = 2
 
     await run_test(dut, DATA, DELAY_ns, reset=False)
 
