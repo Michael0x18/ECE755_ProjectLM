@@ -92,7 +92,7 @@ lm_SPI #(16) iSPI (
 
     .tx_data(tx_data),
 
-    .send_rx(DONE),
+    .rx_capture(CAPTURE),
     .rx_data(rx_data)
 );
 

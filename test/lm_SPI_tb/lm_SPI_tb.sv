@@ -11,7 +11,7 @@ localparam WIDTH = 16;
   wire clk;
   wire rst_n;
   wire [WIDTH-1:0] tx_data, rx_data;
-  wire MOSI_async, MISO, SCLK_async, send_rx;
+  wire MOSI_async, MISO, SCLK_async, rx_capture;
 
 lm_SPI #(WIDTH) iDUT (
   .clk,
@@ -20,7 +20,7 @@ lm_SPI #(WIDTH) iDUT (
   .MISO,
   .SCLK_async,
   .tx_data,
-  .send_rx,
+  .rx_capture,
   .rx_data
 );
 
