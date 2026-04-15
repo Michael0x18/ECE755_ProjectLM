@@ -15,6 +15,8 @@ VERILOG_SOURCES += $(wildcard $(SRC_DIR)/*.sv)
 
 else
 
+NETLIST_DIR     = $(PWD)/../../runs/wokwi/final/pnl
+
 # Gate level simulation:
 SIM_BUILD				= sim_build/gl
 COMPILE_ARGS    += -DGL_TEST
@@ -26,7 +28,7 @@ VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitiv
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 
 # this gets copied in by the GDS action workflow
-VERILOG_SOURCES += $(wildcard *.vg)
+VERILOG_SOURCES += $(wildcard *.v)
 
 endif
 
