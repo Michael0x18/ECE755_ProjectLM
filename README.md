@@ -4,7 +4,7 @@
 > You are on your own if you encounter any errors while replicating.
 
 > [!WARNING]
-> This flow was executed on Linux/x86 and MacOS Sequoia.\
+> This flow was executed on Linux/x86_64 and MacOS Sequoia.\
 > We cannot guarantee this flow will work for Windows or other OSes.
 
 ## Dependencies
