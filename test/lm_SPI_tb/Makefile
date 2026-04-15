@@ -12,8 +12,12 @@ ifneq ($(GATES),yes)
 # RTL simulation:
 SIM_BUILD				= sim_build/rtl
 VERILOG_SOURCES += $(wildcard $(SRC_DIR)/*.sv)
+COMPILE_ARGS	  += -D SIM
 
 else
+
+NETLIST_SRC     = $(PWD)/../../runs/wokwi/final/pnl
+PDK_ROOT        ?= ~/.ciel/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/
 
 # Gate level simulation:
 SIM_BUILD				= sim_build/gl
@@ -26,7 +30,7 @@ VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitiv
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 
 # this gets copied in by the GDS action workflow
-VERILOG_SOURCES += $(wildcard *.vg)
+VERILOG_SOURCES += $(wildcard $(NETLIST_SRC)/*.v)
 
 endif
 
