@@ -70,7 +70,7 @@ async def loopback_tx(dut, delays_ns=[5,5,5,5]):
 async def delayed_tx_line(dut, bit_idx, val, delay_ns):                                                                                                                                                                                                                                           
     global _rx_state                                                                                                                                                                                                                                                                              
                                                                                                                                                                                                                                                                              
-    await Timer(delay_ns, units="ns")     
+    await Timer(delay_ns, unit="ns")     
 
     if val:
         # Set bit                                                                                                                                                                                                                                                                                       
@@ -156,16 +156,6 @@ async def run_test(dut, data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns):
     cocotb.log.info("Recieved: 0x%04X", recieved_data)
 
 
-   
-async def loopback_test(dut, data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns):
-    global _initialization
-    if _initialization:
-        await reset_n(dut) 
-        _initialization = False
-    
-    await run_test(dut, data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns)
-
-
 ################################# TESTS #################################
 # DATA = [0xB00F, 0xDEAD, 0x1234]
 DATA = [random.randint(0, 0xFFFF) for _ in range(5)]
@@ -175,10 +165,21 @@ CLOCKS = [16, 1000]  # 62.5 MHz to 1 MHz
 DELAYS = [1, 1000]  # 1 ns to 1 us
 LINE_DELAYS = list(set(itertools.product(DELAYS, repeat=4)))
 
-tf = TestFactory(test_function=loopback_test)
-tf.add_option("data", DATA) 
-tf.add_option("clk_ns", CLOCKS)  # 62.5 MHz to 1 MHz
-tf.add_option("sclk_ns", CLOCKS) # 62.5 MHz to 1 MHz
-tf.add_option("tx_delays_ns", LINE_DELAYS)
-tf.add_option("ack_delay_ns", DELAYS)  
-tf.generate_tests()
+
+@cocotb.parametrize(                                                                                                                                                                                                
+    data=DATA,                                                                                                                                                             
+    clk_ns=CLOCKS,   
+    sclk_ns=CLOCKS,
+    tx_delays_ns=LINE_DELAYS,                                                                                                                                                                       
+    ack_delay_ns=DELAYS
+) 
+async def loopback_test(dut, data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns):
+    global _initialization
+    if _initialization:
+        await reset_n(dut) 
+        _initialization = False
+    
+    await run_test(dut, data, clk_ns, sclk_ns, tx_delays_ns, ack_delay_ns)
+
+
+
