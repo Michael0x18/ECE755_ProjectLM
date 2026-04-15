@@ -12,6 +12,7 @@ ifneq ($(GATES),yes)
 # RTL simulation:
 SIM_BUILD				= sim_build/rtl
 VERILOG_SOURCES += $(wildcard $(SRC_DIR)/*.sv)
+COMPILE_ARGS	  += -D SIM
 
 else
 
@@ -49,4 +50,4 @@ COCOTB_TEST_MODULES = $(TOPLEVEL)
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
 waves:
-	gtkwave $(TOPLEVEL).vcd
+	gtkwave $(TOPLEVEL).vcd >/dev/null 2>&1 &
