@@ -59,7 +59,7 @@ always_ff @(posedge fsm_clk, negedge rst_n) begin
   // Identical counter and done logic as rx_fsm
   else if (~done) begin
     counter <= counter - 1;
-    done <= (counter <= 1);
+    done <= (counter == 0);
   end
 
   else if (done) begin
@@ -71,9 +71,12 @@ end
 // Behavioral from 'state machine' //
 /////////////////////////////////////
 
-assign shift = done ? 1'b0 : ack_pulse;
+logic ack_delayed;
+delayline #(10) dl(ack_delayed, ack_pulse);
 
-neg_pulse_generator send_data_pulse(.rx(loaded | ack_pulse & ~done), .rx_pulse(send_data));
+assign shift = done ? 1'b0 : ack_delayed;
+
+neg_pulse_generator send_data_pulse(.rx(loaded | ack_delayed & ~done), .rx_pulse(send_data));
 
 endmodule
 `default_nettype wire
