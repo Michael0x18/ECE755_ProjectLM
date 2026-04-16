@@ -19,18 +19,42 @@ else
 NETLIST_SRC     = $(PWD)/../../runs/wokwi/final/pnl
 PDK_ROOT        ?= ~/.ciel/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/
 
-# Gate level simulation:
 SIM_BUILD				= sim_build/gl
+
+SDF_FILE        ?= $(PWD)/../../runs/wokwi/final/sdf/nom_tt_025C_1v80/tt_um_lm_chip_top__nom_tt_025C_1v80.sdf
+
+# Gate level simulation:
+ifeq ($(SIM),icarus)
+
 COMPILE_ARGS    += -DGL_TEST
 COMPILE_ARGS    += -DFUNCTIONAL
+PLUSARGS        += -sdf-verbose
+COMPILE_ARGS    += -gspecify
+COMPILE_ARGS    += -ginterconnect
+COMPILE_ARGS    += -T typ
 COMPILE_ARGS    += -DUSE_POWER_PINS
-COMPILE_ARGS    += -DSIM
 COMPILE_ARGS    += -DUNIT_DELAY=\#1
+
+# this gets copied in by the GDS action workflow
+COMPILE_ARGS	  += -DGATES
+PLUSARGS        += +SDF_FILE=$(SDF_FILE)
+# COMPILE_ARGS    += -sdf-typ $(SDF_FILE)
+
+else ifeq ($(SIM),questa)
+
+COMPILE_ARGS    += -suppress 2892
+COMPILE_ARGS    += -suppress 13522
+COMPILE_ARGS    += -suppress 2912
+# SIM_ARGS    += +pulse_e/0
+# SIM_ARGS    += +pulse_r/0
+SIM_ARGS    += -sdftyp /iDUT=$(SDF_FILE)
+
+endif
+
+VERILOG_SOURCES += $(wildcard $(NETLIST_SRC)/*.v)
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 
-# this gets copied in by the GDS action workflow
-VERILOG_SOURCES += $(wildcard $(NETLIST_SRC)/*.v)
 
 endif
 

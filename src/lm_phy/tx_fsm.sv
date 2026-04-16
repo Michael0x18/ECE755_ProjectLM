@@ -59,7 +59,7 @@ always_ff @(posedge fsm_clk, negedge rst_n) begin
   // Identical counter and done logic as rx_fsm
   else if (~done) begin
     counter <= counter - 1;
-    done <= (counter == '0);
+    done <= (counter <= 1);
   end
 
   else if (done) begin

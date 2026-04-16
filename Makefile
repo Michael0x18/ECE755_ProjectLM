@@ -72,10 +72,10 @@ CONTAINER 		?= podman
 TT_SKY_VENV		:= tt_venv
 TT_SKY_PIP		:= tt/$(TT_SKY_VENV)/bin/pip
 
-librelane: runs/wokwi/final/commit_id.json src/*/*.*v
+librelane: runs/wokwi/final/commit_id.json 
 
 librelane-force:
-	touch runs/wokwi/final/commit_id.json
+	touch info.yaml
 	$(MAKE) librelane
 
 .PHONY: klayout
@@ -83,7 +83,7 @@ klayout: | librelane
 	. tt/$(TT_SKY_VENV)/bin/activate
 	env LIBRELANE_CONTAINER_ENGINE=$(CONTAINER) ./tt/tt_tool.py --open-in-klayout
 
-runs/wokwi/final/commit_id.json: src/user_config.json | pdk
+runs/wokwi/final/commit_id.json: src/user_config.json src/*/*.*v | pdk
 	. tt/$(TT_SKY_VENV)/bin/activate
 	env LIBRELANE_CONTAINER_ENGINE=$(CONTAINER) ./tt/tt_tool.py --harden
 	touch $@
