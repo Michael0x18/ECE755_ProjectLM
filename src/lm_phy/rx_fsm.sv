@@ -66,11 +66,15 @@ module rx_fsm #(WIDTH=64) (
 
   assign clr_vld = rst_n & ~rdy_pulse;
 
+	reg vld_async;
+
   always @(posedge clk, negedge rst_n) begin
     if(~rst_n) begin
+			vld_async <= 1'b0;
       vld <= 1'b0;
     end else begin
-      vld <= hold_ack && (counter==0);
+      vld_async <= hold_ack && (counter==0);
+			vld <= vld_async;
     end
   end
 
