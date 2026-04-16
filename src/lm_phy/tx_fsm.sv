@@ -71,12 +71,9 @@ end
 // Behavioral from 'state machine' //
 /////////////////////////////////////
 
-logic ack_delayed;
-delayline #(10) dl(ack_delayed, ack_pulse);
+assign shift = done ? 1'b0 : ack_pulse;
 
-assign shift = done ? 1'b0 : ack_delayed;
-
-neg_pulse_generator send_data_pulse(.rx(loaded | ack_delayed & ~done), .rx_pulse(send_data));
+neg_pulse_generator send_data_pulse(.rx(loaded | ack_pulse & ~done), .rx_pulse(send_data));
 
 endmodule
 `default_nettype wire

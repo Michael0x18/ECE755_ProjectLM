@@ -49,7 +49,7 @@ decoder2_4 decoder(.in(shift_data), .out(decode_out));
 genvar i;
 generate
 	for(i = 0; i < 4; i = i + 1) begin
-		toggle tgl(.rst_n(rst_n), .pulse(decode_out[i] & send_delay), .data(TX[i]) );
+		toggle tgl(.rst_n(rst_n), .pulse(decode_out[i] & send_delay & ~tx_done), .data(TX[i]) );
 	end
 endgenerate
 
