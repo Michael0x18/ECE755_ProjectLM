@@ -25,6 +25,8 @@ module lm_phy_top #(parameter WIDTH = 64) (
   output wire[11:0] dbg
 );
 
+wire [5:0] dbg_tx, dbg_rx;
+
 assign dbg = {dbg_tx, dbg_rx};
 
 	lm_phy_tx #(WIDTH) u_lm_phy_tx(.clk(clk), .rst_n(rst_n), .TX(TX), .TX_ACK(TX_ACK), .tx_in(tx_in), .tx_load(tx_load), .tx_done(tx_done), .dbg(dbg_tx));

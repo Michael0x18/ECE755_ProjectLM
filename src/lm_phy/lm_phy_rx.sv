@@ -39,6 +39,8 @@ assign R[1] = S[0]|S[2]|S[3];
 assign R[2] = S[0]|S[1]|S[3];
 assign R[3] = S[0]|S[1]|S[2];
 
+wire[1:0] rx_encoded;
+
 assign dbg[0] = S[0];
 assign dbg[1] = S[1];
 assign dbg[2] = rx_shift;
@@ -59,8 +61,6 @@ always @(posedge ack_toggle, negedge rst_n) begin
 		RX_ACK <= ~RX_ACK;
 	end
 end
-
-wire[1:0] rx_encoded;
 
 encoder4_2 enc(.in(Q), .out(rx_encoded));
 

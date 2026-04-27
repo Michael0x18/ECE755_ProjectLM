@@ -21,7 +21,7 @@ PDK_ROOT        ?= ~/.ciel/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b
 
 SIM_BUILD				= sim_build/gl
 
-SDF_FILE        ?= $(PWD)/../../runs/wokwi/final/sdf/nom_tt_025C_1v80/tt_um_lm_chip_top__nom_tt_025C_1v80.sdf
+SDF_FILE        ?= $(PWD)/../../runs/wokwi/final/sdf/nom_tt_*/*.sdf
 
 # Gate level simulation:
 ifeq ($(SIM),icarus)

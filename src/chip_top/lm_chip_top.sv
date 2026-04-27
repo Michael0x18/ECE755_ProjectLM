@@ -113,7 +113,9 @@ assign uio_out[7:6] = 2'b0;
 assign uio_oe[4] = 1'b0;
 
 /////////////////// LM PHY /////////////////////
-wire[11:0];
+
+wire [11:0] dbg;
+
 lm_phy_top #(16) iPHY (
 	.clk(clk),
 	.rst_n(rst_n_sync),
