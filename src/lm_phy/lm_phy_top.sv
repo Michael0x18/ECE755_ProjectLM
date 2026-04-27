@@ -19,11 +19,16 @@ module lm_phy_top #(parameter WIDTH = 64) (
 	
 	// TX off chip interface
 	input wire[3:0] RX,
-	output wire RX_ACK
+	output wire RX_ACK,
+
+  // Debug bus
+  output wire[11:0] dbg
 );
 
-	lm_phy_tx #(WIDTH) u_lm_phy_tx(.clk(clk), .rst_n(rst_n), .TX(TX), .TX_ACK(TX_ACK), .tx_in(tx_in), .tx_load(tx_load), .tx_done(tx_done));
-	lm_phy_rx #(WIDTH) u_lm_phy_rx(.clk(clk), .rst_n(rst_n), .RX(RX), .RX_ACK(RX_ACK), .rx_out(rx_out), .rx_vld(rx_vld), .rx_rdy(rx_rdy));
+assign dbg = {dbg_tx, dbg_rx};
+
+	lm_phy_tx #(WIDTH) u_lm_phy_tx(.clk(clk), .rst_n(rst_n), .TX(TX), .TX_ACK(TX_ACK), .tx_in(tx_in), .tx_load(tx_load), .tx_done(tx_done), .dbg(dbg_tx));
+	lm_phy_rx #(WIDTH) u_lm_phy_rx(.clk(clk), .rst_n(rst_n), .RX(RX), .RX_ACK(RX_ACK), .rx_out(rx_out), .rx_vld(rx_vld), .rx_rdy(rx_rdy), .dbg(dbg_rx));
 
 endmodule
 `default_nettype wire

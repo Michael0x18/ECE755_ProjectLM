@@ -10,7 +10,8 @@ module lm_phy_rx #(
 	input wire rx_rdy,
 	output wire rx_vld,
 	input wire  [3:0] RX,
-	output reg RX_ACK
+	output reg RX_ACK,
+  output wire[5:0] dbg
 );
 
 wire[3:0] rx_pulse;
@@ -37,6 +38,13 @@ assign R[0] = S[1]|S[2]|S[3];
 assign R[1] = S[0]|S[2]|S[3];
 assign R[2] = S[0]|S[1]|S[3];
 assign R[3] = S[0]|S[1]|S[2];
+
+assign dbg[0] = S[0];
+assign dbg[1] = S[1];
+assign dbg[2] = rx_shift;
+assign dbg[3] = ack_toggle;
+assign dbg[4] = rx_encoded[0];
+assign dbg[5] = rx_encoded[1];
 
 assign rx_shift_nodelay = |rx_pulse;
 //assign  rx_shift = #500ps rx_shift_nodelay;

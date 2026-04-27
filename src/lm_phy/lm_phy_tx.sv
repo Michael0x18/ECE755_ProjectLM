@@ -8,7 +8,8 @@ module lm_phy_tx #(
 	input wire tx_load,
 	output wire tx_done,
 	output wire[3:0] TX,
-	input wire TX_ACK
+	input wire TX_ACK,
+  output wire[5:0] dbg
 );
 
 reg load_en;
@@ -53,6 +54,12 @@ generate
 	end
 endgenerate
 
+assign dbg[0] = ack_pulse;
+assign dbg[1] = send_data;
+assign dbg[2] = decode_out[0];
+assign dbg[3] = decode_out[1];
+assign dbg[4] = load_clk_gated;
+assign dbg[5] = shift;
 
 endmodule
 `default_nettype wire
